@@ -117,7 +117,7 @@ URL
 
 
 http://www.a.com/a.jshtt">
-<meta property="og:updated_time" content="2017-03-13T16:16:22.797Z">
+<meta property="og:updated_time" content="2017-03-13T16:20:03.008Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="跨域方法总结">
 <meta name="twitter:description" content="前言说起前后台对接，一定离不了跨域问题，而这也是面试中的考点之一，让我们看看什么是同源策略，又该如何解决跨域问题呢？
@@ -426,26 +426,17 @@ http://www.a.com/a.jshtt">
 </tbody>
 </table>
 <h1 id="前端跨域解决方案"><a href="#前端跨域解决方案" class="headerlink" title="前端跨域解决方案"></a>前端跨域解决方案</h1><ol>
-<li>JSONP</li>
-</ol>
-<pre><code>我们知道`&lt;script&gt;`并不受同源策略影响，这就成为了我们的一个突破口，让我们想想该如何使用呢？
-假设我们在a.com/a.html中想获得b.com/jsonp中的数据，我们就会想，如果对面能够通过`&lt;script&gt;`将
-数据传过来就好了。其实这已经完成了一半了，我们的确可以获得数据了，但是有了数据，我们还不知道怎么用呀？
-所以我们需要设置一个回调函数了。比如我们在前端有一个函数：
-
-    function JSONP(data){
-        console.log(data);
-        }
-后台返回的JS里面有以下代码:
-
-       JSONP([1,2,3]);
-那么前端就可以在拿到数据同时执行回调处理数据了，但是还有一个问题，后台怎么知道前端回调函数的名字呢？
-很简单，我们前端请求时在query字段加上回调函数名称告诉后台就好啦，所以前端可以通过以下请求获得跨域
-数据：
-
-        &lt;script src=&quot;b.com/jsop?callback=JSONP&quot;&gt;
-所以当我们需要跨域获取数据时，我们只需要动态添加一个跨域的`&lt;script&gt;`即可
-</code></pre><ol>
+<li><p>JSONP</p>
+<p>我们知道<code>&lt;script&gt;</code>并不受同源策略影响，这就成为了我们的一个突破口，让我们想想该如何使用呢？<br>假设我们在a.com/a.html中想获得b.com/jsonp中的数据，我们就会想，如果对面能够通过<code>&lt;script&gt;</code>将<br>数据传过来就好了。其实这已经完成了一半了，我们的确可以获得数据了，但是有了数据，我们还不知道怎么用呀？<br>所以我们需要设置一个回调函数了。比如我们在前端有一个函数：</p>
+<pre><code>function JSONP(data){
+    console.log(data);
+    }
+</code></pre><p>后台返回的JS里面有以下代码:</p>
+<pre><code>JSONP([1,2,3]);
+</code></pre><p>那么前端就可以在拿到数据同时执行回调处理数据了，但是还有一个问题，后台怎么知道前端回调函数的名字呢？<br>很简单，我们前端请求时在query字段加上回调函数名称告诉后台就好啦，所以前端可以通过以下请求获得跨域<br>数据：</p>
+<pre><code>&lt;script src=&quot;b.com/jsop?callback=JSONP&quot;&gt;
+</code></pre><p>所以当我们需要跨域获取数据时，我们只需要动态添加一个跨域的<code>&lt;script&gt;</code>即可</p>
+</li>
 <li>CORS</li>
 </ol>
 
