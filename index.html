@@ -267,6 +267,194 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/13/跨域方法总结/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Stein Lee">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Stein's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/03/13/跨域方法总结/" itemprop="url">
+                  跨域方法总结
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-13T23:33:53+08:00">
+                2017-03-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>说起前后台对接，一定离不了跨域问题，而这也是面试中的考点之一，让我们看看什么是同源策略，又该如何解决跨域问题呢？</p>
+<h1 id="什么是同源策略"><a href="#什么是同源策略" class="headerlink" title="什么是同源策略"></a>什么是同源策略</h1><p>所谓同源策略，就是在本域的JavaScript不能操作其他域重点的页面对象以及数据，当协议名、主机名、端口号相同时<br>我们称之为同源，同源下的文件可以互相通信，让我们举例方便理解：</p>
+<table>
+<thead>
+<tr>
+<th>URL</th>
+<th style="text-align:center">说明</th>
+<th style="text-align:right">是否允许通信</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="http://www.a.com/a.js" target="_blank" rel="external">http://www.a.com/a.js</a><br><a href="http://www.a.com/b.js" target="_blank" rel="external">http://www.a.com/b.js</a></td>
+<td style="text-align:center">相同协议，相同域名，相同端口</td>
+<td style="text-align:right">yes</td>
+</tr>
+<tr>
+<td><a href="http://www.a.com/a.js" target="_blank" rel="external">http://www.a.com/a.js</a><br><a href="http://www.b.com/b.js" target="_blank" rel="external">http://www.b.com/b.js</a></td>
+<td style="text-align:center">相同协议，不同域名，相同端口</td>
+<td style="text-align:right">no</td>
+</tr>
+<tr>
+<td><a href="http://www.a.com/a.js" target="_blank" rel="external">http://www.a.com/a.js</a><br><a href="http://a.com/b.js" target="_blank" rel="external">http://a.com/b.js</a></td>
+<td style="text-align:center">相同协议，二级域名，相同端口</td>
+<td style="text-align:right">no</td>
+</tr>
+<tr>
+<td><a href="http://www.a.com/a.js" target="_blank" rel="external">http://www.a.com/a.js</a><br><a href="http://mail.a.com/b.js" target="_blank" rel="external">http://mail.a.com/b.js</a></td>
+<td style="text-align:center">相同协议，子域名，相同端口</td>
+<td style="text-align:right">no</td>
+</tr>
+<tr>
+<td><a href="http://www.a.com/a.js" target="_blank" rel="external">http://www.a.com/a.js</a><br><a href="http://www.a.com:8081/b.js" target="_blank" rel="external">http://www.a.com:8081/b.js</a></td>
+<td style="text-align:center">相同协议，相同域名，不同端口</td>
+<td style="text-align:right">no</td>
+</tr>
+<tr>
+<td><a href="http://www.a.com/a.js" target="_blank" rel="external">http://www.a.com/a.js</a><br><a href="http://www.a.com/b.js" target="_blank" rel="external">http://www.a.com/b.js</a></td>
+<td style="text-align:center">不同协议，相同域名，相同端口</td>
+<td style="text-align:right">no</td>
+</tr>
+<tr>
+<td><a href="http://www.a.com/a.js" target="_blank" rel="external">http://www.a.com/a.js</a><br><a href="http://10.21.71.1/b.js" target="_blank" rel="external">http://10.21.71.1/b.js</a></td>
+<td style="text-align:center">相同协议，域名和域名IP，相同端口</td>
+<td style="text-align:right">no</td>
+</tr>
+</tbody>
+</table>
+<h1 id="前端跨域解决方案"><a href="#前端跨域解决方案" class="headerlink" title="前端跨域解决方案"></a>前端跨域解决方案</h1><ol>
+<li>JSONP</li>
+</ol>
+<pre><code>我们知道`&lt;script&gt;`并不受同源策略影响，这就成为了我们的一个突破口，让我们想想该如何使用呢？
+假设我们在a.com/a.html中想获得b.com/jsonp中的数据，我们就会想，如果对面能够通过`&lt;script&gt;`将
+数据传过来就好了。其实这已经完成了一半了，我们的确可以获得数据了，但是有了数据，我们还不知道怎么用呀？
+所以我们需要设置一个回调函数了。比如我们在前端有一个函数：
+
+    function JSONP(data){
+        console.log(data);
+        }
+后台返回的JS里面有以下代码:
+
+       JSONP([1,2,3]);
+那么前端就可以在拿到数据同时执行回调处理数据了，但是还有一个问题，后台怎么知道前端回调函数的名字呢？
+很简单，我们前端请求时在query字段加上回调函数名称告诉后台就好啦，所以前端可以通过以下请求获得跨域
+数据：
+
+        &lt;script src=&quot;b.com/jsop?callback=JSONP&quot;&gt;
+所以当我们需要跨域获取数据时，我们只需要动态添加一个跨域的`&lt;script&gt;`即可
+</code></pre><ol>
+<li>CORS</li>
+</ol>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/13/libflexible源码阅读/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -546,7 +734,7 @@
               
                 
                 <a class="post-title-link" href="/2017/02/27/重读《javascript高程》（一）/" itemprop="url">
-                  重读《javascript高程》（一）
+                  重读《javascript高程》（一）——
                 </a>
               
             
@@ -664,7 +852,7 @@
               
                 
                 <a class="post-title-link" href="/2017/02/27/Vue2-0源码学习-一/" itemprop="url">
-                  Vue2.0源码学习(一)
+                  Vue2.0源码学习(一)——响应式原理和双向数据绑定
                 </a>
               
             
@@ -920,7 +1108,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-count">5</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -931,7 +1119,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-count">2</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
