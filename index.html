@@ -344,214 +344,19 @@
       
         
           
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>所谓三栏布局，即使指两边定宽，中间宽度自使用的布局方式，在过去，一直是一个麻烦的问题，<br>为了解决这个问题，有各种奇技淫巧，最出名的非圣杯布局和双飞翼布局莫属了，但是自CSS3发展以来，<br>特别是flexbox布局的支持度越来越好，这个问题也越来越淡化了</p>
-<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><ol>
-<li><p>浮动布局</p>
-<p>HTML如下：</p>
-<pre><code>&lt;div class=&quot;left&quot;&gt;Left&lt;/div&gt;
-&lt;div class=&quot;right&quot;&gt;Right&lt;/div&gt;
-&lt;div class=&quot;main&quot;&gt;Main&lt;/div&gt;
-</code></pre><p>CSS如下：</p>
-<pre><code>body, html {
-      height: 100%;
-      padding: 0;
-      margin: 0;
-    }
-    .left{
-      background: red;
-      width:100px;
-      float: left;
-      height:100%;
-    }
-    .main{
-      background:blue;
-      height:100%;
-      margin-left:100px;
-      margin-right:200px;
-    }
-    .right{
-      background:red;
-      width:200px;
-      float: right;
-      height:100%;
-    }
-</code></pre><p>浮动布局代码比较简洁，同时也易于理解，但是浮动往往会带来塌陷等问题，而且浮动渲染计算量<br>较大，在移动端性能表现较差</p>
-</li>
-<li><p>绝对定位</p>
-<p>HTML如下：</p>
-<pre><code>&lt;div class=&quot;left&quot;&gt;left&lt;/div&gt;
-&lt;div class=&quot;main&quot;&gt;main&lt;/div&gt;
-&lt;div class=&quot;right&quot;&gt;right&lt;/div&gt;
-</code></pre><p>CSS如下：</p>
-<pre><code>body, html {
-   height: 100%;
-   padding: 0;
-   margin: 0;
- }
-
- .left, .right {
-   position: absolute;
-   top: 0;
-   background: red;
-   height: 100%;
- }
-
- .left {
-   left: 0;
-   width: 100px;
- }
-
- .right {
-   right: 0;
-   width: 200px;
- }
-
- .main {
-   margin-left: 100px;
-   margin-right: 200px;
-   height: 100%;
-   background: blue;
- }
-</code></pre><p>该方法有个明显的缺点，就是如果中间栏含有最小宽度限制，或是含有宽度的内部元素，当浏览器宽度小到一定程度，会发生层重叠的情况</p>
-</li>
-<li><p>圣杯布局</p>
-<p>圣杯布局巧妙的利用负margin来使元素上移，再结合相对定位，移到外层容器的padding位置，从而达到目标</p>
-<p>HTML如下：</p>
-<pre><code>&lt;div class=&quot;main&quot;&gt;main&lt;/div&gt;
-&lt;div class=&quot;left&quot;&gt;left&lt;/div&gt;
-&lt;div class=&quot;right&quot;&gt;right&lt;/div&gt;
-</code></pre><p>CSS如下：</p>
-<pre><code>body, html {
-      height: 100%;
-      padding: 0;
-      margin: 0;
-    }
-    body{
-      padding-left:100px;
-      padding-right:200px;
-    }
-    .left{
-      background: red;
-      width:100px;
-      float: left;
-      margin-left:-100%;/*-100%：1、导致left超出body内容(此时body内容宽度只有100%-200-100）移到上层2：margin是根据父元素的宽度的，所以-100%就到上层body内容的最前*/
-      position: relative;
-      left:-100px;/*-100px为了超出body内容左边,到达视窗最左*/
-      height:100%;
-    }
-    .main{
-      background: blue;
-      width:100%;
-      height:100%;
-      float: left;
-    }
-    .right{
-      background:red;
-      width:200px;
-      height:100%;
-      float: left;
-      margin-left:-200px;/*-200px为了超出body内容到达上一层body内容最后*/
-      position: relative;
-      right:-200px;/*-200px是为了向右偏移回到视窗最右*/
-    }
-    .container{
-      width:500px;
-      height:200px;
-    }
-</code></pre><p>问题：如果外层内容盒宽度过小，不足以容纳.left的宽度，那么.left依然会被保留在下层</p>
-</li>
-<li><p>双飞翼布局</p>
-<p>双飞翼布局与圣杯布局原理类似，只不过是取消了外层的padding，从而使内容盒等于padding-box从而避免了.left上移后需要设置left值移动到padding</p>
-<p>HTML如下：</p>
-<pre><code>&lt;div class=&quot;main&quot;&gt;
-  &lt;div class=&quot;inner&quot;&gt;
-    main
-  &lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;left&quot;&gt;
-  left
-&lt;/div&gt;
-&lt;div class=&quot;right&quot;&gt;
-  right
-&lt;/div&gt;
-</code></pre><p>CSS如下：</p>
-<pre><code>body, html {
-     height: 100%;
-     padding: 0;
-     margin: 0;
-   }
-   body{
-     /*padding-left:100px;*/
-     /*padding-right:200px;*/
-   }
-   .left{
-     background: red;
-     width:100px;
-     float: left;
-     margin-left:-100%;/*-100% 1：是为了超出body内容(此时body内容为100%)最左 2：到达body上层内容最左也就是视窗最左
-     /*position: relative;*/
-     /*left:-100px;*/
-     height:100%;
-   }
-   .main{
-     background: blue;
-     width:100%;
-     height:100%;
-     float: left;
-   }
-   .right{
-     background:red;
-     width:200px;
-     height:100%;
-     float: left;
-     margin-left:-200px;/*-200px 1：是为了超出body内容(此时body内容为100%)最左 2：到达body上层内容最右也就是视窗最右
-     /*position: relative;*/
-     /*right:-200px;*/
-   }
-   .inner{
-     margin-left:100px;
-     margin-right:200px;
-   }
-</code></pre><p>与圣杯布局不同的地方已用注释指出，而双飞翼问题与圣杯一样</p>
-</li>
-<li><p>flexbox布局</p>
-<p>flexbox布局可谓是最为理想的解决方案了，一方面，代码简洁易懂，另一方面，当宽度太小时，也可以通过伸缩，避免重叠</p>
-<p>HTML如下：</p>
-<pre><code>&lt;div class=&quot;main&quot;&gt;main&lt;/div&gt;
-&lt;div class=&quot;left&quot;&gt;left&lt;/div&gt;
-&lt;div class=&quot;right&quot;&gt;right&lt;/div&gt;
-</code></pre><p>CSS如下：</p>
-<pre><code>body,html{
-   height:100%;
-   padding: 0;
-   margin:0;
- }
- body{
-   display: flex;
-   flex-flow:row nowrap;
- }
- .left{
-   background: red;
-   width:100px;
-   height:100%;
-   order:0;
- }
- .main{
-   background-color: blue;
-   flex:1;
-   height:100%;
-   order:1;
- }
- .right{
-   background: red;
-   width:200px;
-   height:100%;
-   order:2;
- }
-</code></pre></li>
-</ol>
-
-          
+          前言所谓三栏布局，即使指两边定宽，中间宽度自使用的布局方式，在过去，一直是一个麻烦的问题，为了解决这个问题，有各种奇技淫巧，最出名的非圣杯布局和双飞翼布局莫属了，但是自CSS3发展以来，特别是flexbox布局的支持度越来越好，这个问题也越来越淡化了
+正文
+浮动布局
+HTML如下：
+&lt;div 
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/03/14/三栏布局/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -667,70 +472,16 @@
       
         
           
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>说起前后台对接，一定离不了跨域问题，而这也是面试中的考点之一，让我们看看什么是同源策略，又该如何解决跨域问题呢？</p>
-<h1 id="什么是同源策略"><a href="#什么是同源策略" class="headerlink" title="什么是同源策略"></a>什么是同源策略</h1><p>所谓同源策略，就是在本域的JavaScript不能操作其他域重点的页面对象以及数据，当协议名、主机名、端口号相同时<br>我们称之为同源，同源下的文件可以互相通信，让我们举例方便理解：</p>
-<table>
-<thead>
-<tr>
-<th>URL</th>
-<th style="text-align:center">说明</th>
-<th style="text-align:right">是否允许通信</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="http://www.a.com/a.js" target="_blank" rel="external">http://www.a.com/a.js</a><br><a href="http://www.a.com/b.js" target="_blank" rel="external">http://www.a.com/b.js</a></td>
-<td style="text-align:center">相同协议，相同域名，相同端口</td>
-<td style="text-align:right">yes</td>
-</tr>
-<tr>
-<td><a href="http://www.a.com/a.js" target="_blank" rel="external">http://www.a.com/a.js</a><br><a href="http://www.b.com/b.js" target="_blank" rel="external">http://www.b.com/b.js</a></td>
-<td style="text-align:center">相同协议，不同域名，相同端口</td>
-<td style="text-align:right">no</td>
-</tr>
-<tr>
-<td><a href="http://www.a.com/a.js" target="_blank" rel="external">http://www.a.com/a.js</a><br><a href="http://a.com/b.js" target="_blank" rel="external">http://a.com/b.js</a></td>
-<td style="text-align:center">相同协议，二级域名，相同端口</td>
-<td style="text-align:right">no</td>
-</tr>
-<tr>
-<td><a href="http://www.a.com/a.js" target="_blank" rel="external">http://www.a.com/a.js</a><br><a href="http://mail.a.com/b.js" target="_blank" rel="external">http://mail.a.com/b.js</a></td>
-<td style="text-align:center">相同协议，子域名，相同端口</td>
-<td style="text-align:right">no</td>
-</tr>
-<tr>
-<td><a href="http://www.a.com/a.js" target="_blank" rel="external">http://www.a.com/a.js</a><br><a href="http://www.a.com:8081/b.js" target="_blank" rel="external">http://www.a.com:8081/b.js</a></td>
-<td style="text-align:center">相同协议，相同域名，不同端口</td>
-<td style="text-align:right">no</td>
-</tr>
-<tr>
-<td><a href="http://www.a.com/a.js" target="_blank" rel="external">http://www.a.com/a.js</a><br><a href="http://www.a.com/b.js" target="_blank" rel="external">http://www.a.com/b.js</a></td>
-<td style="text-align:center">不同协议，相同域名，相同端口</td>
-<td style="text-align:right">no</td>
-</tr>
-<tr>
-<td><a href="http://www.a.com/a.js" target="_blank" rel="external">http://www.a.com/a.js</a><br><a href="http://10.21.71.1/b.js" target="_blank" rel="external">http://10.21.71.1/b.js</a></td>
-<td style="text-align:center">相同协议，域名和域名IP，相同端口</td>
-<td style="text-align:right">no</td>
-</tr>
-</tbody>
-</table>
-<h1 id="前端跨域解决方案"><a href="#前端跨域解决方案" class="headerlink" title="前端跨域解决方案"></a>前端跨域解决方案</h1><ol>
-<li><p>JSONP</p>
-<p>我们知道<code>&lt;script&gt;</code>并不受同源策略影响，这就成为了我们的一个突破口，让我们想想该如何使用呢？<br>假设我们在a.com/a.html中想获得b.com/jsonp中的数据，我们就会想，如果对面能够通过<code>&lt;script&gt;</code>将<br>数据传过来就好了。其实这已经完成了一半了，我们的确可以获得数据了，但是有了数据，我们还不知道怎么用呀？<br>所以我们需要设置一个回调函数了。比如我们在前端有一个函数：</p>
-<pre><code>function JSONP(data){
-    console.log(data);
-    }
-</code></pre><p>后台返回的JS里面有以下代码:</p>
-<pre><code>JSONP([1,2,3]);
-</code></pre><p>那么前端就可以在拿到数据同时执行回调处理数据了，但是还有一个问题，后台怎么知道前端回调函数的名字呢？<br>很简单，我们前端请求时在query字段加上回调函数名称告诉后台就好啦，所以前端可以通过以下请求获得跨域<br>数据：</p>
-<pre><code>&lt;script src=&quot;b.com/jsop?callback=JSONP&quot;&gt;
-</code></pre><p>所以当我们需要跨域获取数据时，我们只需要动态添加一个跨域的<code>&lt;script&gt;</code>即可</p>
-</li>
-<li>CORS</li>
-</ol>
-
-          
+          前言说起前后台对接，一定离不了跨域问题，而这也是面试中的考点之一，让我们看看什么是同源策略，又该如何解决跨域问题呢？
+什么是同源策略所谓同源策略，就是在本域的JavaScript不能操作其他域重点的页面对象以及数据，当协议名、主机名、端口号相同时我们称之为同源，同源下的文件可以互相通信，让我们举例方
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/03/13/跨域方法总结/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -846,147 +597,16 @@
       
         
           
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>最近需要一款移动端的产品，当时需要赶工期，在参考了天猫的flexbox布局和手淘的<br>rem布局方案后，决定选用libflexible。做完项目之后，稍有空闲时间，决定看看libflexible<br>如何实现动态设置根元素的字体，从而通过rem的方式改变其他元素大小</p>
-<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><p>首先我们看一下flexible需要哪些属性</p>
-<pre><code>;(function(win, lib) {
-    var doc = win.document;
-    var docEl = doc.documentElement;
-    var metaEl = doc.querySelector(&apos;meta[name=&quot;viewport&quot;]&apos;);
-    var flexibleEl = doc.querySelector(&apos;meta[name=&quot;flexible&quot;]&apos;);
-    var dpr = 0;
-    var scale = 0;
-    var tid;
-    var flexible = lib.flexible || (lib.flexible = {});
-</code></pre><p>在函数运行时，我们需要将windows对象注入，然后在看看windows下是否已经存在lib（即是否已经有<br>使用过flexible）了，注入完之后，我们依次获得doc，docEl，metaEl，flexibleEl，其中metaEl<br>是为了判断我们是否已经有预设好的viewport，flexibleEl则是判断我们已经手动设置好dpr来避免<br>flexible库动态设置dpr</p>
-<pre><code>if (metaEl) {
-     console.warn(&apos;将根据已有的meta标签来设置缩放比例&apos;);
-     var match = metaEl.getAttribute(&apos;content&apos;).match(/initial\-scale=([\d\.]+)/);
-     if (match) {
-         scale = parseFloat(match[1]);
-         dpr = parseInt(1 / scale);
-     }
- }
-</code></pre><p>如果metaEl存在的话，意味着页面上存在形如<code>&lt;meta name=&quot;viewport&quot; content=&quot;initial-scale=1&quot;&gt;</code>的标签，此时我们已经明确了我们需要的缩放，不再需要flexible的介入，缩放值scale直接<br>使用预设的initial-scale，通过我们预设的的缩放，我们的layout viewport将会是 ideal viewport/scale，如果我们的initual-scale为1的话<br>且ideal为414px的话，我们的layout viewport将会是414px</p>
-<pre><code>else if (flexibleEl) {
-       var content = flexibleEl.getAttribute(&apos;content&apos;);
-       if (content) {
-           var initialDpr = content.match(/initial\-dpr=([\d\.]+)/);
-           var maximumDpr = content.match(/maximum\-dpr=([\d\.]+)/);
-           if (initialDpr) {
-               dpr = parseFloat(initialDpr[1]);
-               scale = parseFloat((1 / dpr).toFixed(2));
-           }
-           if (maximumDpr) {
-               dpr = parseFloat(maximumDpr[1]);
-               scale = parseFloat((1 / dpr).toFixed(2));
-           }
-       }
-   }
-</code></pre><p>如果我们没有设置初始的viewport但是有<code>&lt;meta name=&quot;flexible&quot; content=&quot;initial-dpr=2&quot; /&gt;</code>这样的flexible自身的预设<br>那么我们将会有预设的dpr，此时flexible将根据我们预设的dpr通过<code>scale=1/dpr</code>的方式来计算出我们的缩放，进而影响layout viewport<br>的大小</p>
-<pre><code>if (!dpr &amp;&amp; !scale) {
-       var isAndroid = win.navigator.appVersion.match(/android/gi);
-       var isIPhone = win.navigator.appVersion.match(/iphone/gi);
-       var devicePixelRatio = win.devicePixelRatio;
-       if (isIPhone) {
-           // iOS下，对于2和3的屏，用2倍的方案，其余的用1倍方案
-           if (devicePixelRatio &gt;= 3 &amp;&amp; (!dpr || dpr &gt;= 3)) {
-               dpr = 3;
-           } else if (devicePixelRatio &gt;= 2 &amp;&amp; (!dpr || dpr &gt;= 2)){
-               dpr = 2;
-           } else {
-               dpr = 1;
-           }
-       } else {
-           // 其他设备下，仍旧使用1倍的方案
-           dpr = 1;
-       }
-       scale = 1 / dpr;
-   }
-</code></pre><p>接下来，如果我们既没有通过<code>&lt;meta name=&quot;flexible&quot; content=&quot;initial-dpr=2&quot; /&gt;</code>这种方式预设dpr，<br>也没有通过<code>&lt;meta name=&quot;viewport&quot; content=&quot;initial-scale=1&quot;&gt;</code>的方式预设缩放，此时flexible开始根据<br>设备的dpr来动态计算缩放。对于非苹果设备，flexible设置dpr为1，对于苹果设备，iPhone3以下非retina屏，dpr为1<br>iPhone4-iPhone6为retina屏，dpr为2，iPhone6Plus为retina HD屏，dpr为3，由于flexible是一个专注于移动端<br>的解决方案，所以平板（包括iPad）或者桌面端的dpr都为1</p>
-<pre><code>docEl.setAttribute(&apos;data-dpr&apos;, dpr);
- if (!metaEl) {
-     metaEl = doc.createElement(&apos;meta&apos;);
-     metaEl.setAttribute(&apos;name&apos;, &apos;viewport&apos;);
-     metaEl.setAttribute(&apos;content&apos;, &apos;initial-scale=&apos; + scale + &apos;, maximum-scale=&apos; + scale + &apos;, minimum-scale=&apos; + scale + &apos;, user-scalable=no&apos;);
-     if (docEl.firstElementChild) {
-         docEl.firstElementChild.appendChild(metaEl);
-     } else {
-         var wrap = doc.createElement(&apos;div&apos;);
-         wrap.appendChild(metaEl);
-         doc.write(wrap.innerHTML);
-     }
- }
-</code></pre><p>计算完缩放后，将获取的dpr值设置到根元素上，这样我们就可以通过以下方式：</p>
-<pre><code>.selector {
-    width: 2rem;
-    border: 1px solid #ddd;
-}
-[data-dpr=&quot;1&quot;] .selector {
-    height: 32px;
-    font-size: 14px;
-}
-[data-dpr=&quot;2&quot;] .selector {
-    height: 64px;
-    font-size: 28px;
-}
-[data-dpr=&quot;3&quot;] .selector {
-    height: 96px;
-    font-size: 42px;
-}
-</code></pre><p>为不同dpr的屏幕设置不同的字体大小，字体之所以不用rem布局，是因为</p>
-<blockquote>
-<p>  我们不希望文本在Retina屏幕下变小，另外，我们希望在大屏手机上看到更多文本，以及，现在绝大多数的字体文件都自带一些点阵尺寸，通常是16px和24px，所以我们不希望出现13px和15px这样的奇葩尺寸。</p>
-</blockquote>
-<p>同时当不存在metaEl时，flexible动态生成一条<code>&lt;meta name=&quot;viewport&quot; content=&quot;initial-scale=${scale},maximum-scale=${scale},minimum-scale=${scale},user-scalable=no&quot;&gt;</code><br>的标签，如果<code>&lt;html&gt;</code>下存在元素（如<code>&lt;head&gt;</code>等元素）那么，将meta标签插入，如果没有，就将meta标签用一个div包装，然后<br>通过document.write写入到文档中</p>
-<pre><code>function refreshRem(){
-       var width = docEl.getBoundingClientRect().width;
-       if (width / dpr &gt; 540) {
-           width = 540 * dpr;
-       }
-       var rem = width / 10;
-       docEl.style.fontSize = rem + &apos;px&apos;;
-       flexible.rem = win.rem = rem;
-   }
-</code></pre><p>好了，缩放和dpr都设置好了，下一步我们要设置根元素的font-size了，这样我们可以通过rem的方式<br>适配不同屏幕。首先我们需要通过<code>docEl.getBoundingClientRect().width</code>获得layout viewport的宽度，<br>然后将layout viewport宽度分为10份，1份为1rem。至于设置540px，是为了让在ipad横屏这种情况下浏览页面，不至于因为拉伸适配后体验太差。当然这还是有一点点问题的<br>因为这样10rem将不会是ipad的满屏了。当然这是移动端解决方案，并没有考虑平板和桌面端</p>
-<pre><code>win.addEventListener(&apos;resize&apos;, function() {
-      clearTimeout(tid);
-      tid = setTimeout(refreshRem, 300);
-  }, false);
-  win.addEventListener(&apos;pageshow&apos;, function(e) {
-      if (e.persisted) {
-          clearTimeout(tid);
-          tid = setTimeout(refreshRem, 300);
-      }
-  }, false);
-</code></pre><p>接着当窗口发生变化或者页面重新从缓存中载入时，我们都要重新设置尺寸</p>
-<pre><code>if (doc.readyState === &apos;complete&apos;) {
-       doc.body.style.fontSize = 12 * dpr + &apos;px&apos;;
-   } else {
-       doc.addEventListener(&apos;DOMContentLoaded&apos;, function(e) {
-           doc.body.style.fontSize = 12 * dpr + &apos;px&apos;;
-       }, false);
-   }
-</code></pre><p>body上设置12 * dpr的font-size值，为了重置页面中的字体默认值，不然没有设置font-size的元素会继承html上的font-size，变得很大。</p>
-<pre><code>flexible.dpr = win.dpr = dpr;
-        flexible.refreshRem = refreshRem;
-        flexible.rem2px = function ( d ) {
-            var val = parseFloat ( d ) * this.rem;
-            if ( typeof d === &apos;string&apos; &amp;&amp; d.match ( /rem$/ ) ) {
-                val += &apos;px&apos;;
-            }
-            return val;
-        }
-        flexible.px2rem = function ( d ) {
-            var val = parseFloat ( d ) / this.rem;
-            if ( typeof d === &apos;string&apos; &amp;&amp; d.match ( /px$/ ) ) {
-                val += &apos;rem&apos;;
-            }
-            return val;
-        }
-</code></pre><p>最后，flexible提供了两个工具函数px2rem和rem2px，这里就不在阐述了</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>看完flexible，实实在在的感受到rem布局的妙处，通过动态设置缩放系数的方式，<br>让layout viewport与设计图对应，极大地方便了重构，同时也避免了1px的问题，<br>然而略有遗憾的就是在安卓和ipad上的表现不佳了。</p>
-
-          
+          前言最近需要一款移动端的产品，当时需要赶工期，在参考了天猫的flexbox布局和手淘的rem布局方案后，决定选用libflexible。做完项目之后，稍有空闲时间，决定看看libflexible如何实现动态设置根元素的字体，从而通过rem的方式改变其他元素大小
+正文首先我们看一下flexible需要
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/03/13/libflexible源码阅读/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1102,9 +722,16 @@
       
         
           
-            <p>code:</p>
+          code:
 
           
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/02/27/重读《javascript高程》（一）/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1220,8 +847,15 @@
       
         
           
-            
           
+          
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/02/27/Vue2-0源码学习-一/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1337,17 +971,15 @@
       
         
           
-            <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
-
-          
+          Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in 
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/02/26/hello-world/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
