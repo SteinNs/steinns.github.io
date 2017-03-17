@@ -89,23 +89,20 @@
 
 <meta name="description" content="前言最近需要一款移动端的产品，当时需要赶工期，在参考了天猫的flexbox布局和手淘的rem布局方案后，决定选用libflexible。做完项目之后，稍有空闲时间，决定看看libflexible如何实现动态设置根元素的字体，从而通过rem的方式改变其他元素大小
 正文首先我们看一下flexible需要哪些属性
-;(function(win, lib) {
-    var doc = win.docu">
+123456789;(function(win, lib) &amp;#123;    var d">
 <meta property="og:type" content="article">
 <meta property="og:title" content="libflexible源码阅读">
 <meta property="og:url" content="http://yoursite.com/2017/03/13/libflexible源码阅读/index.html">
 <meta property="og:site_name" content="Stein's blog">
 <meta property="og:description" content="前言最近需要一款移动端的产品，当时需要赶工期，在参考了天猫的flexbox布局和手淘的rem布局方案后，决定选用libflexible。做完项目之后，稍有空闲时间，决定看看libflexible如何实现动态设置根元素的字体，从而通过rem的方式改变其他元素大小
 正文首先我们看一下flexible需要哪些属性
-;(function(win, lib) {
-    var doc = win.docu">
-<meta property="og:updated_time" content="2017-03-16T08:38:39.926Z">
+123456789;(function(win, lib) &amp;#123;    var d">
+<meta property="og:updated_time" content="2017-03-17T11:23:02.054Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="libflexible源码阅读">
 <meta name="twitter:description" content="前言最近需要一款移动端的产品，当时需要赶工期，在参考了天猫的flexbox布局和手淘的rem布局方案后，决定选用libflexible。做完项目之后，稍有空闲时间，决定看看libflexible如何实现动态设置根元素的字体，从而通过rem的方式改变其他元素大小
 正文首先我们看一下flexible需要哪些属性
-;(function(win, lib) {
-    var doc = win.docu">
+123456789;(function(win, lib) &amp;#123;    var d">
 
 
 
@@ -352,24 +349,9 @@
       
         <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>最近需要一款移动端的产品，当时需要赶工期，在参考了天猫的flexbox布局和手淘的<br>rem布局方案后，决定选用libflexible。做完项目之后，稍有空闲时间，决定看看libflexible<br>如何实现动态设置根元素的字体，从而通过rem的方式改变其他元素大小</p>
 <h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><p>首先我们看一下flexible需要哪些属性</p>
-<pre><code>;(function(win, lib) {
-    var doc = win.document;
-    var docEl = doc.documentElement;
-    var metaEl = doc.querySelector(&apos;meta[name=&quot;viewport&quot;]&apos;);
-    var flexibleEl = doc.querySelector(&apos;meta[name=&quot;flexible&quot;]&apos;);
-    var dpr = 0;
-    var scale = 0;
-    var tid;
-    var flexible = lib.flexible || (lib.flexible = {});
+<pre><code><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">;(<span class="function"><span class="keyword">function</span>(<span class="params">win, lib</span>) </span>&#123;</div><div class="line">    <span class="keyword">var</span> doc = win.document;</div><div class="line">    <span class="keyword">var</span> docEl = doc.documentElement;</div><div class="line">    <span class="keyword">var</span> metaEl = doc.querySelector(<span class="string">'meta[name="viewport"]'</span>);</div><div class="line">    <span class="keyword">var</span> flexibleEl = doc.querySelector(<span class="string">'meta[name="flexible"]'</span>);</div><div class="line">    <span class="keyword">var</span> dpr = <span class="number">0</span>;</div><div class="line">    <span class="keyword">var</span> scale = <span class="number">0</span>;</div><div class="line">    <span class="keyword">var</span> tid;</div><div class="line">    <span class="keyword">var</span> flexible = lib.flexible || (lib.flexible = &#123;&#125;);</div></pre></td></tr></table></figure>
 </code></pre><p>在函数运行时，我们需要将windows对象注入，然后在看看windows下是否已经存在lib（即是否已经有<br>使用过flexible）了，注入完之后，我们依次获得doc，docEl，metaEl，flexibleEl，其中metaEl<br>是为了判断我们是否已经有预设好的viewport，flexibleEl则是判断我们已经手动设置好dpr来避免<br>flexible库动态设置dpr</p>
-<pre><code>if (metaEl) {
-     console.warn(&apos;将根据已有的meta标签来设置缩放比例&apos;);
-     var match = metaEl.getAttribute(&apos;content&apos;).match(/initial\-scale=([\d\.]+)/);
-     if (match) {
-         scale = parseFloat(match[1]);
-         dpr = parseInt(1 / scale);
-     }
- }
+<pre><code><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> (metaEl) &#123;</div><div class="line">     <span class="built_in">console</span>.warn(<span class="string">'将根据已有的meta标签来设置缩放比例'</span>);</div><div class="line">     <span class="keyword">var</span> match = metaEl.getAttribute(<span class="string">'content'</span>).match(<span class="regexp">/initial\-scale=([\d\.]+)/</span>);</div><div class="line">     <span class="keyword">if</span> (match) &#123;</div><div class="line">         scale = <span class="built_in">parseFloat</span>(match[<span class="number">1</span>]);</div><div class="line">         dpr = <span class="built_in">parseInt</span>(<span class="number">1</span> / scale);</div><div class="line">     &#125;</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
 </code></pre><p>如果metaEl存在的话，意味着页面上存在形如<code>&lt;meta name=&quot;viewport&quot; content=&quot;initial-scale=1&quot;&gt;</code>的标签，此时我们已经明确了我们需要的缩放，不再需要flexible的介入，缩放值scale直接<br>使用预设的initial-scale，通过我们预设的的缩放，我们的layout viewport将会是 ideal viewport/scale，如果我们的initual-scale为1的话<br>且ideal为414px的话，我们的layout viewport将会是414px</p>
 <pre><code>else if (flexibleEl) {
        var content = flexibleEl.getAttribute(&apos;content&apos;);
