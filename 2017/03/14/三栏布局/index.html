@@ -91,8 +91,7 @@
 正文
 浮动布局
 HTML如下：
-&amp;lt;div class=&amp;quot;left&amp;quot;&amp;gt;Left&amp;lt;/div&amp;gt;
-&amp;lt;div">
+123&amp;lt;div class=&quot;left&quot;&amp;gt;Left&amp;lt;/div&amp;gt;&amp;lt;div class=&quot;">
 <meta property="og:type" content="article">
 <meta property="og:title" content="三栏布局">
 <meta property="og:url" content="http://yoursite.com/2017/03/14/三栏布局/index.html">
@@ -101,17 +100,15 @@ HTML如下：
 正文
 浮动布局
 HTML如下：
-&amp;lt;div class=&amp;quot;left&amp;quot;&amp;gt;Left&amp;lt;/div&amp;gt;
-&amp;lt;div">
-<meta property="og:updated_time" content="2017-03-16T08:36:54.772Z">
+123&amp;lt;div class=&quot;left&quot;&amp;gt;Left&amp;lt;/div&amp;gt;&amp;lt;div class=&quot;">
+<meta property="og:updated_time" content="2017-03-20T10:08:41.912Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="三栏布局">
 <meta name="twitter:description" content="前言所谓三栏布局，即使指两边定宽，中间宽度自使用的布局方式，在过去，一直是一个麻烦的问题，为了解决这个问题，有各种奇技淫巧，最出名的非圣杯布局和双飞翼布局莫属了，但是自CSS3发展以来，特别是flexbox布局的支持度越来越好，这个问题也越来越淡化了
 正文
 浮动布局
 HTML如下：
-&amp;lt;div class=&amp;quot;left&amp;quot;&amp;gt;Left&amp;lt;/div&amp;gt;
-&amp;lt;div">
+123&amp;lt;div class=&quot;left&quot;&amp;gt;Left&amp;lt;/div&amp;gt;&amp;lt;div class=&quot;">
 
 
 
@@ -360,206 +357,40 @@ HTML如下：
 <h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><ol>
 <li><p>浮动布局</p>
 <p>HTML如下：</p>
-<pre><code>&lt;div class=&quot;left&quot;&gt;Left&lt;/div&gt;
-&lt;div class=&quot;right&quot;&gt;Right&lt;/div&gt;
-&lt;div class=&quot;main&quot;&gt;Main&lt;/div&gt;
+<pre><code><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"left"</span>&gt;</span>Left<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"right"</span>&gt;</span>Right<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"main"</span>&gt;</span>Main<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure>
 </code></pre><p>CSS如下：</p>
-<pre><code>body, html {
-      height: 100%;
-      padding: 0;
-      margin: 0;
-    }
-    .left{
-      background: red;
-      width:100px;
-      float: left;
-      height:100%;
-    }
-    .main{
-      background:blue;
-      height:100%;
-      margin-left:100px;
-      margin-right:200px;
-    }
-    .right{
-      background:red;
-      width:200px;
-      float: right;
-      height:100%;
-    }
+<pre><code><figure class="highlight css"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="selector-tag">body</span>, <span class="selector-tag">html</span> &#123;</div><div class="line">      <span class="attribute">height</span>: <span class="number">100%</span>;</div><div class="line">      <span class="attribute">padding</span>: <span class="number">0</span>;</div><div class="line">      <span class="attribute">margin</span>: <span class="number">0</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="selector-class">.left</span>&#123;</div><div class="line">      <span class="attribute">background</span>: red;</div><div class="line">      <span class="attribute">width</span>:<span class="number">100px</span>;</div><div class="line">      <span class="attribute">float</span>: left;</div><div class="line">      <span class="attribute">height</span>:<span class="number">100%</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="selector-class">.main</span>&#123;</div><div class="line">      <span class="attribute">background</span>:blue;</div><div class="line">      <span class="attribute">height</span>:<span class="number">100%</span>;</div><div class="line">      <span class="attribute">margin-left</span>:<span class="number">100px</span>;</div><div class="line">      <span class="attribute">margin-right</span>:<span class="number">200px</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="selector-class">.right</span>&#123;</div><div class="line">      <span class="attribute">background</span>:red;</div><div class="line">      <span class="attribute">width</span>:<span class="number">200px</span>;</div><div class="line">      <span class="attribute">float</span>: right;</div><div class="line">      <span class="attribute">height</span>:<span class="number">100%</span>;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
 </code></pre><p>浮动布局代码比较简洁，同时也易于理解，但是浮动往往会带来塌陷等问题，而且浮动渲染计算量<br>较大，在移动端性能表现较差。另一个需要注意的是，main即中间部分需要放在最后，如果是left-main-right的方式<br>纳闷main部分将会占满剩余空间，right也就被挤到下一行了，相反，如果我们设置了right和left，在设置main<br>main部分将会流入left和right的下面，从而达到我们的目的</p>
 </li>
 <li><p>绝对定位</p>
 <p>HTML如下：</p>
-<pre><code>&lt;div class=&quot;left&quot;&gt;left&lt;/div&gt;
-&lt;div class=&quot;main&quot;&gt;main&lt;/div&gt;
-&lt;div class=&quot;right&quot;&gt;right&lt;/div&gt;
+<pre><code><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"left"</span>&gt;</span>left<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"main"</span>&gt;</span>main<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"right"</span>&gt;</span>right<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure>
 </code></pre><p>CSS如下：</p>
-<pre><code>body, html {
-   height: 100%;
-   padding: 0;
-   margin: 0;
- }
-
- .left, .right {
-   position: absolute;
-   top: 0;
-   background: red;
-   height: 100%;
- }
-
- .left {
-   left: 0;
-   width: 100px;
- }
-
- .right {
-   right: 0;
-   width: 200px;
- }
-
- .main {
-   margin-left: 100px;
-   margin-right: 200px;
-   height: 100%;
-   background: blue;
- }
+<pre><code><figure class="highlight css"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="selector-tag">body</span>, <span class="selector-tag">html</span> &#123;</div><div class="line">   <span class="attribute">height</span>: <span class="number">100%</span>;</div><div class="line">   <span class="attribute">padding</span>: <span class="number">0</span>;</div><div class="line">   <span class="attribute">margin</span>: <span class="number">0</span>;</div><div class="line"> &#125;</div><div class="line"></div><div class="line"> <span class="selector-class">.left</span>, <span class="selector-class">.right</span> &#123;</div><div class="line">   <span class="attribute">position</span>: absolute;</div><div class="line">   <span class="attribute">top</span>: <span class="number">0</span>;</div><div class="line">   <span class="attribute">background</span>: red;</div><div class="line">   <span class="attribute">height</span>: <span class="number">100%</span>;</div><div class="line"> &#125;</div><div class="line"></div><div class="line"> <span class="selector-class">.left</span> &#123;</div><div class="line">   <span class="attribute">left</span>: <span class="number">0</span>;</div><div class="line">   <span class="attribute">width</span>: <span class="number">100px</span>;</div><div class="line"> &#125;</div><div class="line"></div><div class="line"> <span class="selector-class">.right</span> &#123;</div><div class="line">   <span class="attribute">right</span>: <span class="number">0</span>;</div><div class="line">   <span class="attribute">width</span>: <span class="number">200px</span>;</div><div class="line"> &#125;</div><div class="line"></div><div class="line"> <span class="selector-class">.main</span> &#123;</div><div class="line">   <span class="attribute">margin-left</span>: <span class="number">100px</span>;</div><div class="line">   <span class="attribute">margin-right</span>: <span class="number">200px</span>;</div><div class="line">   <span class="attribute">height</span>: <span class="number">100%</span>;</div><div class="line">   <span class="attribute">background</span>: blue;</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
 </code></pre><p>该方法有个明显的缺点，就是如果中间栏含有最小宽度限制，或是含有宽度的内部元素，当浏览器宽度小到一定程度，会发生层重叠的情况</p>
 </li>
 <li><p>圣杯布局</p>
 <p>圣杯布局巧妙的利用负margin来使元素上移，再结合相对定位，移到外层容器的padding位置，从而达到目标</p>
 <p>HTML如下：</p>
-<pre><code>&lt;div class=&quot;main&quot;&gt;main&lt;/div&gt;
-&lt;div class=&quot;left&quot;&gt;left&lt;/div&gt;
-&lt;div class=&quot;right&quot;&gt;right&lt;/div&gt;
+<pre><code><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"main"</span>&gt;</span>main<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"left"</span>&gt;</span>left<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"right"</span>&gt;</span>right<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure>
 </code></pre><p>CSS如下：</p>
-<pre><code>body, html {
-      height: 100%;
-      padding: 0;
-      margin: 0;
-    }
-    body{
-      padding-left:100px;
-      padding-right:200px;
-    }
-    .left{
-      background: red;
-      width:100px;
-      float: left;
-      margin-left:-100%;/*-100%：1、导致left超出body内容(此时body内容宽度只有100%-200-100）移到上层2：margin是根据父元素的宽度的，所以-100%就到上层body内容的最前*/
-      position: relative;
-      left:-100px;/*-100px为了超出body内容左边,到达视窗最左*/
-      height:100%;
-    }
-    .main{
-      background: blue;
-      width:100%;
-      height:100%;
-      float: left;
-    }
-    .right{
-      background:red;
-      width:200px;
-      height:100%;
-      float: left;
-      margin-left:-200px;/*-200px为了超出body内容到达上一层body内容最后*/
-      position: relative;
-      right:-200px;/*-200px是为了向右偏移回到视窗最右*/
-    }
-    .container{
-      width:500px;
-      height:200px;
-    }
+<pre><code><figure class="highlight css"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line"><span class="selector-tag">body</span>, <span class="selector-tag">html</span> &#123;</div><div class="line">      <span class="attribute">height</span>: <span class="number">100%</span>;</div><div class="line">      <span class="attribute">padding</span>: <span class="number">0</span>;</div><div class="line">      <span class="attribute">margin</span>: <span class="number">0</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="selector-tag">body</span>&#123;</div><div class="line">      <span class="attribute">padding-left</span>:<span class="number">100px</span>;</div><div class="line">      <span class="attribute">padding-right</span>:<span class="number">200px</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="selector-class">.left</span>&#123;</div><div class="line">      <span class="attribute">background</span>: red;</div><div class="line">      <span class="attribute">width</span>:<span class="number">100px</span>;</div><div class="line">      <span class="attribute">float</span>: left;</div><div class="line">      <span class="attribute">margin-left</span>:-<span class="number">100%</span>;<span class="comment">/*-100%：1、导致left超出body内容(此时body内容宽度只有100%-200-100）移到上层2：margin是根据父元素的宽度的，所以-100%就到上层body内容的最前*/</span></div><div class="line">      <span class="attribute">position</span>: relative;</div><div class="line">      <span class="attribute">left</span>:-<span class="number">100px</span>;<span class="comment">/*-100px为了超出body内容左边,到达视窗最左*/</span></div><div class="line">      <span class="attribute">height</span>:<span class="number">100%</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="selector-class">.main</span>&#123;</div><div class="line">      <span class="attribute">background</span>: blue;</div><div class="line">      <span class="attribute">width</span>:<span class="number">100%</span>;</div><div class="line">      <span class="attribute">height</span>:<span class="number">100%</span>;</div><div class="line">      <span class="attribute">float</span>: left;</div><div class="line">    &#125;</div><div class="line">    <span class="selector-class">.right</span>&#123;</div><div class="line">      <span class="attribute">background</span>:red;</div><div class="line">      <span class="attribute">width</span>:<span class="number">200px</span>;</div><div class="line">      <span class="attribute">height</span>:<span class="number">100%</span>;</div><div class="line">      <span class="attribute">float</span>: left;</div><div class="line">      <span class="attribute">margin-left</span>:-<span class="number">200px</span>;<span class="comment">/*-200px为了超出body内容到达上一层body内容最后*/</span></div><div class="line">      <span class="attribute">position</span>: relative;</div><div class="line">      <span class="attribute">right</span>:-<span class="number">200px</span>;<span class="comment">/*-200px是为了向右偏移回到视窗最右*/</span></div><div class="line">    &#125;</div><div class="line">    <span class="selector-class">.container</span>&#123;</div><div class="line">      <span class="attribute">width</span>:<span class="number">500px</span>;</div><div class="line">      <span class="attribute">height</span>:<span class="number">200px</span>;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
 </code></pre><p>问题：如果外层内容盒宽度过小，不足以容纳.left的宽度，那么.left依然会被保留在下层</p>
 </li>
 <li><p>双飞翼布局</p>
 <p>双飞翼布局与圣杯布局原理类似，只不过是取消了外层的padding，从而使内容盒等于padding-box从而避免了.left上移后需要设置left值移动到padding</p>
 <p>HTML如下：</p>
-<pre><code>&lt;div class=&quot;main&quot;&gt;
-  &lt;div class=&quot;inner&quot;&gt;
-    main
-  &lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;left&quot;&gt;
-  left
-&lt;/div&gt;
-&lt;div class=&quot;right&quot;&gt;
-  right
-&lt;/div&gt;
+<pre><code><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"main"</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"inner"</span>&gt;</span></div><div class="line">    main</div><div class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"left"</span>&gt;</span></div><div class="line">  left</div><div class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"right"</span>&gt;</span></div><div class="line">  right</div><div class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure>
 </code></pre><p>CSS如下：</p>
-<pre><code>body, html {
-     height: 100%;
-     padding: 0;
-     margin: 0;
-   }
-   body{
-     /*padding-left:100px;*/
-     /*padding-right:200px;*/
-   }
-   .left{
-     background: red;
-     width:100px;
-     float: left;
-     margin-left:-100%;/*-100% 1：是为了超出body内容(此时body内容为100%)最左 2：到达body上层内容最左也就是视窗最左
-     /*position: relative;*/
-     /*left:-100px;*/
-     height:100%;
-   }
-   .main{
-     background: blue;
-     width:100%;
-     height:100%;
-     float: left;
-   }
-   .right{
-     background:red;
-     width:200px;
-     height:100%;
-     float: left;
-     margin-left:-200px;/*-200px 1：是为了超出body内容(此时body内容为100%)最左 2：到达body上层内容最右也就是视窗最右
-     /*position: relative;*/
-     /*right:-200px;*/
-   }
-   .inner{
-     margin-left:100px;
-     margin-right:200px;
-   }
+<pre><code><figure class="highlight css"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line"><span class="selector-tag">body</span>, <span class="selector-tag">html</span> &#123;</div><div class="line">     <span class="attribute">height</span>: <span class="number">100%</span>;</div><div class="line">     <span class="attribute">padding</span>: <span class="number">0</span>;</div><div class="line">     <span class="attribute">margin</span>: <span class="number">0</span>;</div><div class="line">   &#125;</div><div class="line">   <span class="selector-tag">body</span>&#123;</div><div class="line">     <span class="comment">/*padding-left:100px;*/</span></div><div class="line">     <span class="comment">/*padding-right:200px;*/</span></div><div class="line">   &#125;</div><div class="line">   <span class="selector-class">.left</span>&#123;</div><div class="line">     <span class="attribute">background</span>: red;</div><div class="line">     <span class="attribute">width</span>:<span class="number">100px</span>;</div><div class="line">     <span class="attribute">float</span>: left;</div><div class="line">     <span class="attribute">margin-left</span>:-<span class="number">100%</span>;<span class="comment">/*-100% 1：是为了超出body内容(此时body内容为100%)最左 2：到达body上层内容最左也就是视窗最左</span></div><div class="line">     /*position: relative;*/</div><div class="line">     <span class="comment">/*left:-100px;*/</span></div><div class="line">     <span class="attribute">height</span>:<span class="number">100%</span>;</div><div class="line">   &#125;</div><div class="line">   <span class="selector-class">.main</span>&#123;</div><div class="line">     <span class="attribute">background</span>: blue;</div><div class="line">     <span class="attribute">width</span>:<span class="number">100%</span>;</div><div class="line">     <span class="attribute">height</span>:<span class="number">100%</span>;</div><div class="line">     <span class="attribute">float</span>: left;</div><div class="line">   &#125;</div><div class="line">   <span class="selector-class">.right</span>&#123;</div><div class="line">     <span class="attribute">background</span>:red;</div><div class="line">     <span class="attribute">width</span>:<span class="number">200px</span>;</div><div class="line">     <span class="attribute">height</span>:<span class="number">100%</span>;</div><div class="line">     <span class="attribute">float</span>: left;</div><div class="line">     <span class="attribute">margin-left</span>:-<span class="number">200px</span>;<span class="comment">/*-200px 1：是为了超出body内容(此时body内容为100%)最左 2：到达body上层内容最右也就是视窗最右</span></div><div class="line">     /*position: relative;*/</div><div class="line">     <span class="comment">/*right:-200px;*/</span></div><div class="line">   &#125;</div><div class="line">   <span class="selector-class">.inner</span>&#123;</div><div class="line">     <span class="attribute">margin-left</span>:<span class="number">100px</span>;</div><div class="line">     <span class="attribute">margin-right</span>:<span class="number">200px</span>;</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
 </code></pre><p>与圣杯布局不同的地方已用注释指出，而双飞翼问题与圣杯一样</p>
 </li>
 <li><p>flexbox布局</p>
 <p>flexbox布局可谓是最为理想的解决方案了，一方面，代码简洁易懂，另一方面，当宽度太小时，也可以通过伸缩，避免重叠</p>
 <p>HTML如下：</p>
-<pre><code>&lt;div class=&quot;main&quot;&gt;main&lt;/div&gt;
-&lt;div class=&quot;left&quot;&gt;left&lt;/div&gt;
-&lt;div class=&quot;right&quot;&gt;right&lt;/div&gt;
+<pre><code><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"main"</span>&gt;</span>main<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"left"</span>&gt;</span>left<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"right"</span>&gt;</span>right<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure>
 </code></pre><p>CSS如下：</p>
-<pre><code>body,html{
-   height:100%;
-   padding: 0;
-   margin:0;
- }
- body{
-   display: flex;
-   flex-flow:row nowrap;
- }
- .left{
-   background: red;
-   width:100px;
-   height:100%;
-   order:0;
- }
- .main{
-   background-color: blue;
-   flex:1;
-   height:100%;
-   order:1;
- }
- .right{
-   background: red;
-   width:200px;
-   height:100%;
-   order:2;
- }
+<pre><code><figure class="highlight css"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"><span class="selector-tag">body</span>,<span class="selector-tag">html</span>&#123;</div><div class="line">   <span class="attribute">height</span>:<span class="number">100%</span>;</div><div class="line">   <span class="attribute">padding</span>: <span class="number">0</span>;</div><div class="line">   <span class="attribute">margin</span>:<span class="number">0</span>;</div><div class="line"> &#125;</div><div class="line"> <span class="selector-tag">body</span>&#123;</div><div class="line">   <span class="attribute">display</span>: flex;</div><div class="line">   <span class="attribute">flex-flow</span>:row nowrap;</div><div class="line"> &#125;</div><div class="line"> <span class="selector-class">.left</span>&#123;</div><div class="line">   <span class="attribute">background</span>: red;</div><div class="line">   <span class="attribute">width</span>:<span class="number">100px</span>;</div><div class="line">   <span class="attribute">height</span>:<span class="number">100%</span>;</div><div class="line">   <span class="attribute">order</span>:<span class="number">0</span>;</div><div class="line"> &#125;</div><div class="line"> <span class="selector-class">.main</span>&#123;</div><div class="line">   <span class="attribute">background-color</span>: blue;</div><div class="line">   <span class="attribute">flex</span>:<span class="number">1</span>;</div><div class="line">   <span class="attribute">height</span>:<span class="number">100%</span>;</div><div class="line">   <span class="attribute">order</span>:<span class="number">1</span>;</div><div class="line"> &#125;</div><div class="line"> <span class="selector-class">.right</span>&#123;</div><div class="line">   <span class="attribute">background</span>: red;</div><div class="line">   <span class="attribute">width</span>:<span class="number">200px</span>;</div><div class="line">   <span class="attribute">height</span>:<span class="number">100%</span>;</div><div class="line">   <span class="attribute">order</span>:<span class="number">2</span>;</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
 </code></pre></li>
 </ol>
 
