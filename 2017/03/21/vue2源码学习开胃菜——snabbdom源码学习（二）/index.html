@@ -97,7 +97,7 @@ sameNode这个函数主要用于比较oldvnode与vnode同层">
 <meta property="og:description" content="前言在上一章我们学习了，modules,vnode,h,htmldomapi,is等模块，在这一篇我们将会学习到snabbdom的核心功能——patchVnode和updateChildren功能。
 继续我们的snabbdom源码之旅最终章 snabbdom！首先我们先从简单的部分开始，比如一些工具函数，我将逐个来讲解他们的用处
 sameNode这个函数主要用于比较oldvnode与vnode同层">
-<meta property="og:updated_time" content="2017-03-22T00:37:54.744Z">
+<meta property="og:updated_time" content="2017-03-22T00:39:20.162Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="vue2源码学习开胃菜——snabbdom源码学习（二）">
 <meta name="twitter:description" content="前言在上一章我们学习了，modules,vnode,h,htmldomapi,is等模块，在这一篇我们将会学习到snabbdom的核心功能——patchVnode和updateChildren功能。
@@ -450,7 +450,7 @@ sameNode这个函数主要用于比较oldvnode与vnode同层">
 <h4 id="createElm"><a href="#createElm" class="headerlink" title="createElm"></a>createElm</h4><p>就如太极有阴就有阳一样，既然我们有remove操作，肯定也有createelm的操作，这个函数主要功能<br>如下：</p>
 <ul>
 <li>初始化vnode，调用init钩子</li>
-<li>创建DOM element节点，并将vnode设置的data挂载上去</li>
+<li>创建对应tagname的DOM element节点，并将vnode.sel中的id名和class名挂载上去</li>
 <li>如果有子vnode，递归创建DOM element节点，并添加到父vnode对应的element节点上去，<br>否则如果有text属性，则创建text节点，并添加到父vnode对应的element节点上去</li>
 <li>vnode转换成dom节点操作完成后，调用create钩子</li>
 <li><p>如果vnode上有insert钩子，那么就将这个vnode放入insertedVnodeQueue中作记录，到时<br>再在全局批量调用insert钩子回调</p>
