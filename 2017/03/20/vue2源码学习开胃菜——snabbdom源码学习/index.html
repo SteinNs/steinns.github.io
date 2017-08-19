@@ -1,349 +1,492 @@
-<!doctype html>
+<!DOCTYPE html>
+<html style="display: none;" lang="zh">
+    <head>
+    <meta charset="utf-8">
+    <!--
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.4.0 -->
+    <script>window.materialVersion = "1.4.0"</script>
 
+    <!-- Title -->
+    
+    <title>
+        
+            vue2源码学习开胃菜——snabbdom源码学习（一） | 
+        
+        Stein&#39;s blog
+    </title>
 
-
-  
-
-
-<html class="theme-next mist use-motion" lang="zh-Hans">
-<head>
-  <meta charset="UTF-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-
-
-
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-  
-  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
-
-
-
-
-  
-  
-  
-  
-
-  
+    <!-- dns prefetch -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
     
     
-  
-
-  
-
-  
-
-  
-
-  
-
-  
     
     
-    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
-  
+    
+    
+    
+    
+    
+    
+
+    <!-- Meta & Info -->
+    <meta http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="theme-color" content="#0097A7">
+    <meta name="author" content="Stein Lee">
+    <meta name="description" itemprop="description" content="">
+    <meta name="keywords" content="null,源码,vue,snabbdom">
+
+    <!-- Site Verification -->
+    
+    
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" sizes="192x192" href="/img/favicon.png">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!--iOS -->
+    <meta name="apple-mobile-web-app-title" content="Title">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="480">
+
+    <!-- Add to homescreen for Chrome on Android -->
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- Add to homescreen for Safari on iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Stein&#39;s blog">
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="http://yoursite.com">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="vue2源码学习开胃菜——snabbdom源码学习（一） | Stein&#39;s blog">
+    <meta property="og:image" content="/img/favicon.png" />
+    <meta property="og:description" content="">
+    <meta property="og:article:tag" content="源码"> <meta property="og:article:tag" content="vue"> <meta property="og:article:tag" content="snabbdom"> 
+
+    
+        <meta property="article:published_time" content="3月 20, 2017" />
+        <meta property="article:modified_time" content="8月 19, 2017" />
+    
+
+    <!-- The Twitter Card protocol -->
+    <meta name="twitter:title" content="vue2源码学习开胃菜——snabbdom源码学习（一） | Stein&#39;s blog">
+    <meta name="twitter:description" content="">
+    <meta name="twitter:image" content="/img/favicon.png">
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="http://yoursite.com" />
+
+    <!-- Add canonical link for SEO -->
+    
+        <link rel="canonical" href="http://yoursite.com/2017/03/20/vue2源码学习开胃菜——snabbdom源码学习/index.html" />
+    
+
+    <!-- Structured-data for SEO -->
+    
+        
 
 
-
-
-
-
-<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
-
-<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
-
-
-  <meta name="keywords" content="源码,vue,snabbdom," />
-
-
-
-
-
-
-
-
-  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
-
-
-
-
-
-
-<meta name="description" content="前言最近在学习vue2.0的源码，刚开始看其vdom源码，着实找不到方向，因为其在vdom的实现上还加入了很多vue2.0本身的钩子，加大了阅读难度。于是看到第一行尤大说vue2.0的vdom是在snabbdom的基础上改过来的，而snabbdom只有不到300sloc，那不妨先从snabbdom入手，熟悉其中的原理，再配合vue2.0的vdom看，效果可能更好。
-什么是virtual-domvi">
-<meta property="og:type" content="article">
-<meta property="og:title" content="vue2源码学习开胃菜——snabbdom源码学习（一）">
-<meta property="og:url" content="http://yoursite.com/2017/03/20/vue2源码学习开胃菜——snabbdom源码学习/index.html">
-<meta property="og:site_name" content="Stein's blog">
-<meta property="og:description" content="前言最近在学习vue2.0的源码，刚开始看其vdom源码，着实找不到方向，因为其在vdom的实现上还加入了很多vue2.0本身的钩子，加大了阅读难度。于是看到第一行尤大说vue2.0的vdom是在snabbdom的基础上改过来的，而snabbdom只有不到300sloc，那不妨先从snabbdom入手，熟悉其中的原理，再配合vue2.0的vdom看，效果可能更好。
-什么是virtual-domvi">
-<meta property="og:updated_time" content="2017-03-21T06:17:51.787Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="vue2源码学习开胃菜——snabbdom源码学习（一）">
-<meta name="twitter:description" content="前言最近在学习vue2.0的源码，刚开始看其vdom源码，着实找不到方向，因为其在vdom的实现上还加入了很多vue2.0本身的钩子，加大了阅读难度。于是看到第一行尤大说vue2.0的vdom是在snabbdom的基础上改过来的，而snabbdom只有不到300sloc，那不妨先从snabbdom入手，熟悉其中的原理，再配合vue2.0的vdom看，效果可能更好。
-什么是virtual-domvi">
-
-
-
-<script type="text/javascript" id="hexo.configurations">
-  var NexT = window.NexT || {};
-  var CONFIG = {
-    root: '/',
-    scheme: 'Mist',
-    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
-    fancybox: true,
-    motion: true,
-    duoshuo: {
-      userId: '0',
-      author: '博主'
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "Stein&#39;s blog",
+        "logo": "/img/favicon.png"
     },
-    algolia: {
-      applicationID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
-      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    "author": {
+        "@type": "Person",
+        "name": "Stein Lee",
+        "image": {
+            "@type": "ImageObject",
+            "url": "/img/favicon.png"
+        },
+        "description": "Hi, nice to meet you"
+    },
+    "headline": "vue2源码学习开胃菜——snabbdom源码学习（一）",
+    "url": "http://yoursite.com/2017/03/20/vue2源码学习开胃菜——snabbdom源码学习/index.html",
+    "datePublished": "3月 20, 2017",
+    "dateModified": "8月 19, 2017",
+    "description": "",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "http://yoursite.com"
     }
-  };
+}
 </script>
 
 
-
-  <link rel="canonical" href="http://yoursite.com/2017/03/20/vue2源码学习开胃菜——snabbdom源码学习/"/>
-
-
-
-
-
-  <title> vue2源码学习开胃菜——snabbdom源码学习（一） | Stein's blog </title>
-</head>
-
-<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-  
-    
-  
-
-  <div class="container one-collumn sidebar-position-left page-post-detail ">
-    <div class="headband"></div>
-
-    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-wrapper">
-  <div class="site-meta ">
     
 
-    <div class="custom-logo-site-title">
-      <a href="/"  class="brand" rel="start">
-        <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Stein's blog</span>
-        <span class="logo-line-after"><i></i></span>
-      </a>
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.en.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import lsloader -->
+    <script>(function(){window.lsloader={jsRunSequence:[],jsnamemap:{},cssnamemap:{}};lsloader.removeLS=function(key){try{localStorage.removeItem(key)}catch(e){}};lsloader.setLS=function(key,val){try{localStorage.setItem(key,val)}catch(e){}};lsloader.getLS=function(key){var val="";try{val=localStorage.getItem(key)}catch(e){val=""}return val};versionString="/*"+materialVersion+"*/";lsloader.clean=function(){try{var keys=[];for(var i=0;i<localStorage.length;i++){keys.push(localStorage.key(i))}keys.forEach(function(key){var data=lsloader.getLS(key);if(data&&data.indexOf(versionString)===-1){lsloader.removeLS(key)}})}catch(e){}};lsloader.clean();lsloader.load=function(jsname,jspath,cssonload){cssonload=cssonload||function(){};var code;code=this.getLS(jsname);if(code&&code.indexOf(versionString)===-1){this.removeLS(jsname);this.requestResource(jsname,jspath,cssonload);return}if(code){var versionNumber=code.split(versionString)[0];if(versionNumber!=jspath){console.log("reload:"+jspath);this.removeLS(jsname);this.requestResource(jsname,jspath,cssonload);return}code=code.split(versionString)[1];if(/\.js?.+$/.test(versionNumber)){this.jsRunSequence.push({name:jsname,code:code});this.runjs(jspath,jsname,code)}else{document.getElementById(jsname).appendChild(document.createTextNode(code));cssonload()}}else{this.requestResource(jsname,jspath,cssonload)}};lsloader.requestResource=function(name,path,cssonload){var that=this;if(/\.js?.+$/.test(path)){this.iojs(path,name,function(path,name,code){that.setLS(name,path+versionString+code);that.runjs(path,name,code)})}else if(/\.css?.+$/.test(path)){this.iocss(path,name,function(code){document.getElementById(name).appendChild(document.createTextNode(code));that.setLS(name,path+versionString+code)},cssonload)}};lsloader.iojs=function(path,jsname,callback){var that=this;that.jsRunSequence.push({name:jsname,code:""});try{var xhr=new XMLHttpRequest;xhr.open("get",path,true);xhr.onreadystatechange=function(){if(xhr.readyState==4){if(xhr.status>=200&&xhr.status<300||xhr.status==304){if(xhr.response!=""){callback(path,jsname,xhr.response);return}}that.jsfallback(path,jsname)}};xhr.send(null)}catch(e){that.jsfallback(path,jsname)}};lsloader.iocss=function(path,jsname,callback,cssonload){var that=this;try{var xhr=new XMLHttpRequest;xhr.open("get",path,true);xhr.onreadystatechange=function(){if(xhr.readyState==4){if(xhr.status>=200&&xhr.status<300||xhr.status==304){if(xhr.response!=""){callback(xhr.response);cssonload();return}}that.cssfallback(path,jsname,cssonload)}};xhr.send(null)}catch(e){that.cssfallback(path,jsname,cssonload)}};lsloader.iofonts=function(path,jsname,callback,cssonload){var that=this;try{var xhr=new XMLHttpRequest;xhr.open("get",path,true);xhr.onreadystatechange=function(){if(xhr.readyState==4){if(xhr.status>=200&&xhr.status<300||xhr.status==304){if(xhr.response!=""){callback(xhr.response);cssonload();return}}that.cssfallback(path,jsname,cssonload)}};xhr.send(null)}catch(e){that.cssfallback(path,jsname,cssonload)}};lsloader.runjs=function(path,name,code){if(!!name&&!!code){for(var k in this.jsRunSequence){if(this.jsRunSequence[k].name==name){this.jsRunSequence[k].code=code}}}if(!!this.jsRunSequence[0]&&!!this.jsRunSequence[0].code&&this.jsRunSequence[0].status!="failed"){var script=document.createElement("script");script.appendChild(document.createTextNode(this.jsRunSequence[0].code));script.type="text/javascript";document.getElementsByTagName("head")[0].appendChild(script);this.jsRunSequence.shift();if(this.jsRunSequence.length>0){this.runjs()}}else if(!!this.jsRunSequence[0]&&this.jsRunSequence[0].status=="failed"){var that=this;var script=document.createElement("script");script.src=this.jsRunSequence[0].path;script.type="text/javascript";this.jsRunSequence[0].status="loading";script.onload=function(){that.jsRunSequence.shift();if(that.jsRunSequence.length>0){that.runjs()}};document.body.appendChild(script)}};lsloader.tagLoad=function(path,name){this.jsRunSequence.push({name:name,code:"",path:path,status:"failed"});this.runjs()};lsloader.jsfallback=function(path,name){if(!!this.jsnamemap[name]){return}else{this.jsnamemap[name]=name}for(var k in this.jsRunSequence){if(this.jsRunSequence[k].name==name){this.jsRunSequence[k].code="";this.jsRunSequence[k].status="failed";this.jsRunSequence[k].path=path}}this.runjs()};lsloader.cssfallback=function(path,name,cssonload){if(!!this.cssnamemap[name]){return}else{this.cssnamemap[name]=1}var link=document.createElement("link");link.type="text/css";link.href=path;link.rel="stylesheet";link.onload=link.onerror=cssonload;var root=document.getElementsByTagName("script")[0];root.parentNode.insertBefore(link,root)};lsloader.runInlineScript=function(scriptId,codeId){var code=document.getElementById(codeId).innerText;this.jsRunSequence.push({name:scriptId,code:code});this.runjs()};lsloader.loadCombo=function(jslist){var updateList="";var requestingModules={};for(var k in jslist){var LS=this.getLS(jslist[k].name);if(!!LS){var version=LS.split(versionString)[0];var code=LS.split(versionString)[1]}else{var version=""}if(version==jslist[k].path){this.jsRunSequence.push({name:jslist[k].name,code:code,path:jslist[k].path})}else{this.jsRunSequence.push({name:jslist[k].name,code:null,path:jslist[k].path,status:"comboloading"});requestingModules[jslist[k].name]=true;updateList+=(updateList==""?"":";")+jslist[k].path}}var that=this;if(!!updateList){var xhr=new XMLHttpRequest;xhr.open("get",combo+updateList,true);xhr.onreadystatechange=function(){if(xhr.readyState==4){if(xhr.status>=200&&xhr.status<300||xhr.status==304){if(xhr.response!=""){that.runCombo(xhr.response,requestingModules);return}}else{for(var i in that.jsRunSequence){if(requestingModules[that.jsRunSequence[i].name]){that.jsRunSequence[i].status="failed"}}that.runjs()}}};xhr.send(null)}this.runjs()};lsloader.runCombo=function(comboCode,requestingModules){comboCode=comboCode.split("/*combojs*/");comboCode.shift();for(var k in this.jsRunSequence){if(!!requestingModules[this.jsRunSequence[k].name]&&!!comboCode[0]){this.jsRunSequence[k].status="comboJS";this.jsRunSequence[k].code=comboCode[0];this.setLS(this.jsRunSequence[k].name,this.jsRunSequence[k].path+versionString+comboCode[0]);comboCode.shift()}}this.runjs()}})();</script>
+
+    <!-- Import CSS & jQuery -->
+    
+        <style id="css/material.min.css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("css/material.min.css","/css/material.min.css?fJTiM/K1J3dWIruo3pxtAw==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";})</script>
+        <style id="css/style.min.css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("css/style.min.css","/css/style.min.css?oCSEO3ST+aEypEwttTDI9g==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";})</script>
+        
+        
+            <style>
+    
+    .footer-sns-facebook {
+        background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgY2xhc3M9Imljb24iIHZpZXdCb3g9IjAgMCAxMDI0IDEwMjQiPjxwYXRoIGQ9Ik0xMzguNiA3OGMtMjIuNCA1LjItNTUuOCA0MC4yLTYwLjYgNjMuNC0xLjQgNi40LTIgMTI5LjgtMS42IDM2Ny42LjYgMjk4LjYgMSAzNTguOCAzLjQgMzYzIDExIDIwLjIgMjEuNiAzMi40IDM3LjIgNDMgMTUgMTAuMiAxNy40IDExLjIgMzMgMTMgMTEuMiAxLjQgMTM2IDIgMzY1IDEuNiAzMTQtLjYgMzQ4LjYtMSAzNTUtMy44IDE1LjgtNy4yIDMzLjgtMjIgNDMuMi0zNS40IDUuMi03LjQgMTAuOC0xNi42IDEyLjYtMjAuNCAyLjgtNi40IDMuMi00MC44IDMuOC0zNTQgLjQtMjIzLS4yLTM1My40LTEuNC0zNjUtMi0xNy0yLjYtMTguNi0xMy0zNC04LjYtMTIuNi0xNC4yLTE4LjQtMjUuMi0yNS44LTcuOC01LjQtMTcuNC0xMS0yMS42LTEyLjQtNi0yLjItNzIuOC0yLjYtMzY1LjQtMi42LTE5Ni44LjItMzYxIC44LTM2NC40IDEuOHptNjU3LjYgODcuOGw0LjggMy44djU1LjJjMCA1NC42IDAgNTUuMi00LjYgNTkuNi00LjQgNC40LTYgNC42LTUwLjIgNS42bC00NS42IDEtNy4yIDUuNmMtMTAuNCA4LTE2LjggMTcuMi0xOS4yIDI3LjQtMSA1LTEuOCAyNC44LTEuOCA0NCAuMiAzOCAxLjYgNDQuNiAxMC44IDQ4IDIuOCAxLjIgMjguNCAyIDU2LjggMiA0Ny44IDAgNTIgLjIgNTYuMiAzLjhsNC44IDMuOHY1NS4yYzAgNTQuNiAwIDU1LjItNC42IDU5LjYtNC40IDQuNi01LjQgNC42LTU3IDUuMi0yOC44LjItNTQuNC44LTU2LjggMS40LTIuNC42LTUuNiAzLTYuOCA1LjQtMS44IDMuMi0yLjQgNDEuNC0yLjYgMTQzLjJsLS4yIDEzOC44LTUuNiA0LjgtNS42IDQuOEg2MDljLTUyLjQgMC01Mi44IDAtNTguMi00LjZsLTUuNC00LjYtLjItMTQwLjYtLjItMTQwLjYtNC44LTMuOGMtNC4yLTMuNC04LTMuOC0zNS42LTMuOC0zMi44IDAtNDEtMS44LTQzLjYtMTAtLjYtMi4yLTEuMi0yNS40LTEuMi01MS40IDAtNjAuOC0uMi01NyAzLjQtNjEuNiAyLjgtMy42IDYtNCAzNy44LTUgMzMtMSAzNS4yLTEuMiAzOS40LTUuNiA0LjYtNC40IDQuNi01LjIgNS44LTcxIDEuMi03My40LjItNjcuMiAxNi42LTk5LjQgOC0xNS44IDEyLjgtMjIgMjgtMzcgMTUuMi0xNS4yIDIxLjQtMTkuNiAzOC4yLTI4IDExLTUuNCAyNC0xMSAyOS0xMi4yIDYuMi0xLjggMjguNi0yLjYgNzEuMi0yLjYgNTguNi0uMiA2Mi42IDAgNjcgMy42eiIvPjwvc3ZnPg==);
+    }
+    
+    
+    .footer-sns-twitter {
+        background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgY2xhc3M9Imljb24iIHZpZXdCb3g9IjAgMCAxMDI0IDEwMjQiPjxwYXRoIGQ9Ik0xMzguNiA3OGMtMjIuNCA1LjItNTUuOCA0MC4yLTYwLjYgNjMuNC0xLjQgNi40LTIgMTI5LjgtMS42IDM2Ny42LjYgMjk4LjYgMSAzNTguOCAzLjQgMzYzIDExIDIwLjIgMjEuNiAzMi40IDM3LjIgNDMgMTUgMTAuMiAxNy40IDExLjIgMzMgMTMgMTEuMiAxLjQgMTM2IDIgMzY1IDEuNiAzMTQtLjYgMzQ4LjYtMSAzNTUtMy44IDE1LjgtNy4yIDMzLjgtMjIgNDMuMi0zNS40IDUuMi03LjQgMTAuOC0xNi42IDEyLjYtMjAuNCAyLjgtNi40IDMuMi00MC44IDMuOC0zNTQgLjQtMjIzLS4yLTM1My40LTEuNC0zNjUtMi0xNy0yLjYtMTguNi0xMy0zNC04LjYtMTIuNi0xNC4yLTE4LjQtMjUuMi0yNS44LTcuOC01LjQtMTcuNC0xMS0yMS42LTEyLjQtNi0yLjItNzIuOC0yLjYtMzY1LjQtMi42LTE5Ni44LjItMzYxIC44LTM2NC40IDEuOHptNTMyLjggMjA1YzEwIDQgMjMgMTAuOCAyOC44IDE1LjIgMTIuNiA5LjIgMTYuNiAxMC42IDI5LjQgOS40IDYuNi0uNiAxMy0zLjIgMjAuNC04LjIgMTEuMi03LjYgMTkuNC05LjIgMjMuNi01IDMuNiAzLjYgMi44IDktMi44IDE4LjYtNy4yIDEyLjQtNiAxOC44IDQuMiAyNC4yIDQuNCAyLjIgOC4yIDUuNiA4LjYgNy40IDEgNC44LTEyLjYgMjQuMi0yMiAzMS44LTExLjggOS4yLTE3LjIgMjIuNi0xOS42IDQ3LjgtNC44IDUwLjQtNy44IDY2LjYtMTYuNCA4NS40LTMgNy03IDE3LjgtOC44IDI0LTEuOCA2LjQtNSAxNC42LTcuNCAxOC40LTIuMiAzLjgtNy40IDEzLTExLjQgMjAuNC0xNy4yIDMwLjgtNDMuNCA2MS40LTcxLjQgODMuOC0yNS42IDIwLjQtNDYgMzMuMi02NC4yIDQwLjItOC40IDMuMi0xOCA3LjYtMjEuNCA5LjYtNy40IDQuNi0yMi40IDguNi01Ny4yIDE1LTYyLjIgMTEuNi03OS4yIDExLjQtMTM1LjYtMS0zMi40LTctMzguNi05LTUyLTE2LjgtMjEuNC0xMi42LTI0LjItMTQuOC0yNC4yLTE5LjQgMC02LjIgMTAuMi05LjIgMzUtMTAuNCAyMi40LTEgMjguNi0yLjYgNTctMTQuMiAyMy44LTkuOCAyOS40LTEyLjggMzAuNC0xNi44IDIuMi04LjItMy0xMy4yLTI2LjgtMjUuNC0yNS44LTEzLjItMzIuMi0xOC40LTQzLjgtMzUuOC05LTEzLjYtMTAtMjEuMi0zLjYtMzMuNiA1LjQtMTAuOCAzLjYtMTUtMTEuOC0yNS40LTktNi0xNC0xMS42LTIwLjgtMjIuNi0yMy40LTM3LjgtMjUtNTAuOC03LjItNTkuOCA0LjgtMi40IDkuNC01LjQgMTAuMi02LjYgMi44LTQuMi0uNC0xNS42LTguNC0yOS0xMS42LTE5LjYtMTMuMi0yNS44LTEzLjItNTUuMiAwLTI4LjggMi42LTM3LjggMTItNDAuMiA5LTIuMiAxNC44IDEgMzUuNiAyMC4yIDI0LjggMjIuOCA0My42IDM2LjYgNjIuOCA0NS44IDggMy44IDE3LjggOS4yIDIyIDEyIDQuMiAyLjggMTQuOCA3IDIzLjQgOS4yIDguNiAyLjIgMjQuMiA2LjggMzQuOCAxMC4yIDEzLjQgNC40IDIzLjYgNi40IDMzIDYuNiAxMi44LjIgMTQuMi0uMiAxOC42LTUuNCA0LTQuOCA0LjgtNy44IDQuOC0xOS4yIDAtMTQuNCA1LjYtMzkuNiAxMS4yLTUwLjYgNC4yLTguNCAyOS4yLTM0LjIgMzkuOC00MS40IDcuOC01LjQgMzUuNi0xNiA1Mi0yMCAxNC4yLTMuNiAzMi42LTEuMiA1Mi40IDYuOHoiLz48L3N2Zz4=);
+    }
+    
+    
+    .footer-sns-gplus {
+        background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgY2xhc3M9Imljb24iIHZpZXdCb3g9IjAgMCAxMDI0IDEwMjQiPjxwYXRoIGQ9Ik0xMzguNiA3OGMtMjIuNCA1LjItNTUuOCA0MC4yLTYwLjYgNjMuNC0xLjQgNi40LTIgMTI5LjgtMS42IDM2Ny42LjYgMjk4LjYgMSAzNTguOCAzLjQgMzYzIDExIDIwLjIgMjEuNiAzMi40IDM3LjIgNDMgMTUgMTAuMiAxNy40IDExLjIgMzMgMTMgMTEuMiAxLjQgMTM2IDIgMzY1IDEuNiAzMTQtLjYgMzQ4LjYtMSAzNTUtMy44IDE1LjgtNy4yIDMzLjgtMjIgNDMuMi0zNS40IDUuMi03LjQgMTAuOC0xNi42IDEyLjYtMjAuNCAyLjgtNi40IDMuMi00MC44IDMuOC0zNTQgLjQtMjIzLS4yLTM1My40LTEuNC0zNjUtMi0xNy0yLjYtMTguNi0xMy0zNC04LjYtMTIuNi0xNC4yLTE4LjQtMjUuMi0yNS44LTcuOC01LjQtMTcuNC0xMS0yMS42LTEyLjQtNi0yLjItNzIuOC0yLjYtMzY1LjQtMi42LTE5Ni44LjItMzYxIC44LTM2NC40IDEuOHpNNDMwIDI5NS40YzQwLjYgMTUuNCA1Ni42IDIzLjggNzIuNiAzOC40IDYuOCA2LjIgNy4yIDE1LjIgMSAyMy40LTYuMiA4LTMzLjYgMzMuOC0zOSAzNi42LTUuNiAyLjgtMTcuNiAyLjgtMjMuMi0uMi0yLjQtMS4yLTguMi01LjItMTMtOC44LTExLjItOC42LTI0LjYtMTEuMi01NS4yLTExLjItMjcuNCAwLTQwLjYgMi42LTUyLjIgMTAuNC00LjQgMi44LTEyLjIgNy42LTE3LjIgMTAuNi0yMyAxMy4yLTUxLjQgNTUtNTUuOCA4Mi40LTIuNiAxNS42LTIuNCAzNC44LjIgNTEgMi44IDE3LjQgMTkuOCA0OC44IDM1LjIgNjUuMiAxNiAxNi42IDQ1IDMzLjYgNjIuOCAzNi42IDI2LjggNC40IDY1LjggMS42IDc5LjQtNS44IDIwLjYtMTEuNCAzMS0xOSA0MS0zMC40IDE4LjgtMjEuNiAyMy40LTM0LjIgMTUuNi00My44LTMuOC00LjgtNC40LTQuOC01MS01LjgtNjAuOC0xLjItNTYuMiAyLjItNTYuMi00My4yIDAtMzIuNC4yLTMzLjIgNC44LTM3IDQuNC0zLjYgOS0zLjggOTItMy44IDc5IDAgODcuOC40IDk0LjIgMy42IDExLjIgNS42IDEzIDExLjQgMTIuOCA0My40IDAgMjUuNC0uOCAzMC44LTcuNiA1OC00IDE2LjYtOS44IDM0LTEyLjYgMzktMi44IDUtOC4yIDE0LjItMTEuNiAyMC42LTguNCAxNS40LTI3LjIgMzYuOC00MC44IDQ2LjYtNS44IDQuNC0xMy44IDEwLjItMTcuNiAxMy4yLTMuOCAzLTExIDctMTYuMiA4LjgtNS4yIDEuOC0xNi4yIDYuNC0yNC40IDEwLTIyLjQgOS42LTM0LjggMTEuNi03MyAxMS42LTM3LjYuMi00Ny0xLjQtNzEtMTItOC4yLTMuNi0xNy42LTcuMi0yMC44LTgtMTUuOC0zLjgtNjctNDUuMi03Ny44LTYyLjgtMi4yLTMuOC03LjYtMTEuNi0xMS44LTE3LjItNC4yLTUuNC05LTE0LTEwLjYtMTktMS44LTQuOC02LjItMTYtMTAtMjQuOC0zLjYtOC44LTcuOC0yMi4yLTkuMi0yOS42LTMuMi0xOC44LTEuNC03OS40IDIuOC05MS40IDEzLjgtNDAuNiAzNS42LTc4IDU4LjgtMTAwLjIgMTQtMTMuNiA0Ny4yLTM2LjQgNTgtMzkuOCA0LjItMS40IDEzLjQtNS4yIDIwLjYtOC40IDIyLTEwIDMyLjgtMTEuNiA3Ni0xMSAzMy44LjYgNDAuNCAxLjIgNTAgNC44em0zNDAuOCA4MC44YzggMy42IDkuNiAxMS4yIDkuMiAzOS4yLS42IDM0LjQtLjYgMzQgNSAzOS42IDQuOCA1IDUuNCA1IDM3LjYgNSA0My40IDAgNDQuNC44IDQzLjIgMzYuMi0uOCAxNy0xLjIgMTguNC02LjQgMjMtNS40IDQuNi02LjYgNC44LTM3LjYgNC44LTMxLjIgMC0zMiAuMi0zNi44IDUtNS42IDUuNC01LjYgNC40LTUgNDEuMi40IDI2LjQuMiAyNy40LTQuNiAzMy00LjggNS42LTYgNS44LTI0LjQgNi40LTIwLjguOC0yOS42LTEuNC0zMy40LTguNC0xLjQtMi42LTItMTUuNi0xLjgtMzUuNi40LTMxLjIuNC0zMS42LTQuNi0zNi42cy01LjYtNS0zNi01Yy0xOC44IDAtMzMtLjgtMzYtMi4yLTcuNi0zLjYtOS42LTExLjItOC44LTMzLjguOC0yOC4yLjQtMjggNDEtMjggNDUuNCAwIDQ1LjQgMCA0NC42LTQyLjYtLjYtMzMtLjYtMzMgNS0zOC40IDQuNC00LjYgNi4yLTUgMjQuOC01IDExIDAgMjIuMiAxIDI1IDIuMnoiLz48L3N2Zz4=);
+    }
+    
+    
+    
+    
+    
+    .footer-sns-github {
+        background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgY2xhc3M9Imljb24iIHZpZXdCb3g9IjAgMCAxMDI0IDEwMjQiPjxwYXRoIGQ9Ik0xMzguNCA3OGMtNi40IDEuNC0yNi40IDE0LjItMzYgMjIuOC04IDcuMi0yMiAyOS44LTI0LjQgMzkuMi0xLjYgNi40LTIgMTEzLjItMS42IDM2OCAuNiAyOTkuNCAxIDM1OS44IDMuNCAzNjQgMTEgMjAuMiAyMS42IDMyLjQgMzcuMiA0MyAxNS42IDEwLjYgMTcuMiAxMS4yIDM0LjIgMTMuMiAxMC42IDEuMiA2My40IDEuNiAxMjcuNiAxLjRsMTA5LjYtLjYgNi02LjggNi4yLTYuOC0xLjItMjUuMmMtLjgtMTUuOC0uMi0zMy40IDEuNC00Ny4yIDMtMjUuNCAxLjQtMzYuMi02LTQzLjItNS00LjYtNi4yLTQuOC0zMC42LTQuMi0yNy42LjgtMjQgMS42LTY4LjgtMTYtOC42LTMuNC0yMi42LTE4LTI4LjQtMjkuOC0xMS40LTIyLjgtMjctNDUtMzkuMi01NS42LTE0LTEyLjItMTkuOC0yMC44LTE5LjgtMjguNiAwLTExLjYgMTMuNi0xMi42IDMzLjItMi40IDE2LjYgOC44IDIwLjggMTIuNCA0MC44IDM2LjIgMjQuMiAyOC42IDMxIDMzLjYgNTQgMzkuNiAxNS4yIDQgNDIuMiAzIDUxLjQtMS44IDktNC42IDE4LTE1LjIgMjQuNC0yOS4yIDExLjQtMjQuMiA3LjQtMzEuMi0yMC42LTM2LjgtOS44LTItMjkuMi04LTQzLjQtMTMuNC00MC40LTE1LjgtNjQuNi0zNy40LTg1LjQtNzYuMi0xMS42LTIxLjgtMTUuNC0zMy0xOC4yLTUzLjYtNC4yLTMyLjItNC44LTYwLjItMS40LTg0IDMuNC0yMy44IDYuOC0zMi44IDIwLjItNTQgNC02IDguOC0xNS42IDExLTIxLjQgMy44LTEwIDMuOC0xMS42IDEtMzAtNS4yLTM0LjItMy4yLTUyLjQgNy42LTcwLjIgNy4yLTEyLjIgMTUtMTcuMiAyNC4yLTE1LjggMTIuOCAyLjIgNTIgMTcuNCA2Ni44IDI2LjIgMjYgMTUgMjkgMTUuNCA4Mi40IDcuMiAyNC42LTMuOCAzMy44LTQuMiA2MC0zLjIgMTcgLjYgNDEuNCAzIDU0IDUuMiAzOC40IDYuNiA0OS42IDUuMiA3My0xMCA2LjYtNC4yIDE3LjQtOS40IDI0LTExLjYgNi42LTIuMiAxNi01LjggMjEtOC4yIDEzLTYgMjgtNS42IDM1LjYuOCAxMi40IDEwLjQgMTguNiA0MS40IDE0LjQgNzEuNi00LjQgMzAuNi0zIDM5LjQgOC40IDUzLjggMy40IDQuNCAxMS4yIDE5LjIgMTcuNCAzMy4yTDc3NSA0NDN2NzhsLTEwIDI4Yy0xNS4yIDQzLjItMzYuOCA3My4yLTY2LjIgOTIuOC0xMy40IDguOC01NyAyNS40LTc2LjggMjktMjguMiA1LjItMzMuMiAxMi42LTIyIDMyLjIgMTEuMiAxOS40IDEyLjQgMzIuOCAxMS42IDEyOS42bC0uNiA4NS44IDUuNCA0LjZjMy42IDMgOS4yIDUuMiAxNiA2IDUuOC44IDYwLjIgMSAxMjAuNi42IDEwOC40LS42IDExMC4yLS42IDExOS01IDI0LTExLjYgNDAtMjcuNCA1MS42LTUwLjZsNS40LTExIC42LTM0N2MuNC0yMjMtLjItMzUzLjQtMS40LTM2NS0yLTE3LTIuNi0xOC42LTEzLTM0LTEwLjYtMTUuNC0yMi44LTI2LjItNDMuMi0zNy4yLTQuMi0yLjQtNjQuNi0yLjgtMzY2LTMuMi0xOTguNiAwLTM2NCAuNC0zNjcuNiAxLjR6Ii8+PC9zdmc+);
+    }
+    
+    
+    
+    
+    
+</style>
+
+        
+        <!-- Config CSS -->
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #0097A7 !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #0097A7 !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #0097A7 !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-color: #F5F5F5;
+      }
+
+      /* blog_info bottom background */
+      #scheme-Paradox .material-layout .something-else .mdl-card__supporting-text{
+        background-color: #fff;
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+    <style>
+      .fade {
+        transition: all 800ms linear;
+        -webkit-transform: translate3d(0,0,0);
+        -moz-transform: translate3d(0,0,0);
+        -ms-transform: translate3d(0,0,0);
+        -o-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+        opacity: 1;
+      }
+
+      .fade.out{
+        opacity: 0;
+      }
+    </style>
+
+
+<!-- Import Font -->
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"rel="stylesheet">
+
+
+        <script>lsloader.load("js/jquery.min.js","/js/jquery.min.js?qcusAULNeBksqffqUM2+Ig==")</script>
+    
+    
+    <script>function Queue(){this.dataStore=[];this.offer=b;this.poll=d;this.execNext=a;this.debug=false;this.startDebug=c;function b(e){if(this.debug){console.log("Offered a Queued Function.")}if(typeof e==="function"){this.dataStore.push(e)}else{console.log("You must offer a function.")}}function d(){if(this.debug){console.log("Polled a Queued Function.")}return this.dataStore.shift()}function a(){var e=this.poll();if(e!==undefined){if(this.debug){console.log("Run a Queued Function.")}e()}}function c(){this.debug=true}}var queue=new Queue();</script>
+
+    <!-- Analytics -->
+    
+
+    <!-- Custom Head -->
+    
+<link rel="stylesheet" href="/css/prism.css" type="text/css"></head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
     </div>
-      
-        <p class="site-subtitle"></p>
-      
-  </div>
+    -->
 
-  <div class="site-nav-toggle">
-    <button>
-      <span class="btn-bar"></span>
-      <span class="btn-bar"></span>
-      <span class="btn-bar"></span>
+    <!-- Left aligned menu below button -->
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
     </button>
-  </div>
+
+    
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#前言"><span class="post-toc-number">1.</span> <span class="post-toc-text">前言</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#什么是virtual-dom"><span class="post-toc-number">2.</span> <span class="post-toc-text">什么是virtual-dom</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#为什么是virtual-dom"><span class="post-toc-number">3.</span> <span class="post-toc-text">为什么是virtual-dom</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#snabbdom目录结构"><span class="post-toc-number">4.</span> <span class="post-toc-text">snabbdom目录结构</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#snabbdom源码之旅"><span class="post-toc-number">5.</span> <span class="post-toc-text">snabbdom源码之旅</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#第一站-vnode"><span class="post-toc-number">5.1.</span> <span class="post-toc-text">第一站 vnode</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#第二站-h"><span class="post-toc-number">5.2.</span> <span class="post-toc-text">第二站 h</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#第三站-htmldomapi"><span class="post-toc-number">5.3.</span> <span class="post-toc-text">第三站 htmldomapi</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#第四站-modules"><span class="post-toc-number">5.4.</span> <span class="post-toc-text">第四站 modules</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#attributes"><span class="post-toc-number">5.4.1.</span> <span class="post-toc-text">attributes</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#class"><span class="post-toc-number">5.4.2.</span> <span class="post-toc-text">class</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#dataset"><span class="post-toc-number">5.4.3.</span> <span class="post-toc-text">dataset</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#eventlistener"><span class="post-toc-number">5.4.4.</span> <span class="post-toc-text">eventlistener</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#props"><span class="post-toc-number">5.4.5.</span> <span class="post-toc-text">props</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#style"><span class="post-toc-number">5.4.6.</span> <span class="post-toc-text">style</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#第五站-is"><span class="post-toc-number">5.5.</span> <span class="post-toc-text">第五站 is</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#中途休息"><span class="post-toc-number">5.6.</span> <span class="post-toc-text">中途休息</span></a></li></ol></li></ol>
+        <!--
+        <li class="mdl-menu__item">
+            Some Action
+        </li>
+        -->
+    </ul>
+    
+
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        
+            <!-- Random Thumbnail -->
+            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
+            <script type="text/ls-javascript" id="post-thumbnail-script">
+    var randomNum = Math.floor(Math.random() * 19 + 1);
+
+    $('.post_thumbnail-random').attr('data-original', '/img/random/material-' + randomNum + '.png');
+    $('.post_thumbnail-random').addClass('lazy');
+</script>
+
+        
+    
+            <p class="article-headline-p">
+                vue2源码学习开胃菜——snabbdom源码学习（一）
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.png" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>Stein Lee</strong>
+        <span>3月 20, 2017</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/snabbdom/">snabbdom</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/vue/">vue</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/源码/">源码</a>
+    </ul>
+    
+
+    <!-- Share -->
+    <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=vue2源码学习开胃菜——snabbdom源码学习（一）&url=http://yoursite.com/2017/03/20/vue2源码学习开胃菜——snabbdom源码学习/index.html&pic=&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                分享到微博
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+        <a class="post_share-link" href="https://twitter.com/intent/tweet?text=vue2源码学习开胃菜——snabbdom源码学习（一）&url=http://yoursite.com/2017/03/20/vue2源码学习开胃菜——snabbdom源码学习/index.html&via=Stein Lee" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Twitter
+            </li>
+        </a>
+    
+
+    <!-- Share Facebook -->
+    
+        <a class="post_share-link" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2017/03/20/vue2源码学习开胃菜——snabbdom源码学习/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Facebook
+            </li>
+        </a>
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=http://yoursite.com/2017/03/20/vue2源码学习开胃菜——snabbdom源码学习/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+
+    <!-- Share Telegram -->
+    
+</ul>
+
 </div>
 
-<nav class="site-nav">
-  
+                
 
-  
-    <ul id="menu" class="menu">
-      
-        
-        <li class="menu-item menu-item-home">
-          <a href="/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
-            
-            首页
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-categories">
-          <a href="/categories" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
-            
-            分类
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-about">
-          <a href="/about" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
-            
-            关于
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-archives">
-          <a href="/archives" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
-            
-            归档
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-tags">
-          <a href="/tags" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
-            
-            标签
-          </a>
-        </li>
-      
-
-      
-    </ul>
-  
-
-  
-</nav>
-
-
-
- </div>
-    </header>
-
-    <main id="main" class="main">
-      <div class="main-inner">
-        <div class="content-wrap">
-          <div id="content" class="content">
-            
-
-  <div id="posts" class="posts-expand">
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
     
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/20/vue2源码学习开胃菜——snabbdom源码学习/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Stein Lee">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Stein's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                vue2源码学习开胃菜——snabbdom源码学习（一）
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-20T15:30:02+08:00">
-                2017-03-20
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
         <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>最近在学习vue2.0的源码，刚开始看其vdom源码，着实找不到方向，因为其在vdom的实现上还加<br>入了很多vue2.0本身的钩子，加大了阅读难度。于是看到第一行尤大说vue2.0的vdom是在snabbdom<br>的基础上改过来的，而snabbdom只有不到300sloc，那不妨先从snabbdom入手，熟悉其中的原理，<br>再配合vue2.0的vdom看，效果可能更好。</p>
 <h1 id="什么是virtual-dom"><a href="#什么是virtual-dom" class="headerlink" title="什么是virtual-dom"></a>什么是virtual-dom</h1><p>virtual-dom可以看做一棵模拟了DOM树的JavaScript树，其主要是通过vnode,实现一个无<br>状态的组件，当组件状态发生更新时，然后触发virtual-dom数据的变化，然后通过virtual-dom<br>和真实DOM的比对，再对真实dom更新。</p>
 <h1 id="为什么是virtual-dom"><a href="#为什么是virtual-dom" class="headerlink" title="为什么是virtual-dom"></a>为什么是virtual-dom</h1><p>我们知道，当我们希望实现一个具有复杂状态的界面时，如果我们在每个可能发生变化的组件上都绑定<br>事件，绑定字段数据，那么很快由于状态太多，我们需要维护的事件和字段将会越来越多，代码也会<br>越来越复杂，于是，我们想我们可不可以将视图和状态分开来，只要视图发生变化，对应状态也发生<br>变化，然后状态变化，我们再重绘整个视图就好了。这样的想法虽好，但是代价太高了，于是我们又<br>想，能不能只更新状态发生变化的视图？于是virtual-dom应运而生，状态变化先反馈到vdom上，<br>vdom在找到最小更新视图，最后批量更新到真实DOM上，从而达到性能的提升。</p>
@@ -426,8 +569,24 @@
 </tbody>
 </table>
 <h1 id="snabbdom源码之旅"><a href="#snabbdom源码之旅" class="headerlink" title="snabbdom源码之旅"></a>snabbdom源码之旅</h1><h2 id="第一站-vnode"><a href="#第一站-vnode" class="headerlink" title="第一站 vnode"></a>第一站 vnode</h2><p>首先，我们从最简单的vnode开始入手，vnode实现的功能非常简单，就是讲输入的数据转化为vnode<br>对象的形式</p>
-<pre><code><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//VNode函数，用于将输入转化成VNode</span></div><div class="line"><span class="comment">/**</span></div><div class="line"> *</div><div class="line"> * @param sel	选择器</div><div class="line"> * @param data	绑定的数据</div><div class="line"> * @param children	子节点数组</div><div class="line"> * @param text	当前text节点内容</div><div class="line"> * @param elm	对真实dom element的引用</div><div class="line"> * @returns &#123;&#123;sel: *, data: *, children: *, text: *, elm: *, key: undefined&#125;&#125;</div><div class="line"> */</div><div class="line"><span class="built_in">module</span>.exports = <span class="function"><span class="keyword">function</span> (<span class="params"> sel, data, children, text, elm </span>) </span>&#123;</div><div class="line">	<span class="keyword">var</span> key = data === <span class="literal">undefined</span> ? <span class="literal">undefined</span> : data.key;</div><div class="line">	<span class="keyword">return</span> &#123;</div><div class="line">		<span class="attr">sel</span>: sel, <span class="attr">data</span>: data, <span class="attr">children</span>: children,</div><div class="line">		<span class="attr">text</span>: text, <span class="attr">elm</span>: elm, <span class="attr">key</span>: key</div><div class="line">	&#125;;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
-</code></pre><p>vnode主要有5大属性：</p>
+<pre class=" language-javascript"><code class="language-javascript">  <span class="token comment" spellcheck="true">/**
+    * VNode函数，用于将输入转化成VNode
+    * @param sel    选择器
+    * @param data    绑定的数据
+    * @param children    子节点数组
+    * @param text    当前text节点内容
+    * @param elm    对真实dom element的引用
+    * @returns {{sel: *, data: *, children: *, text: *, elm: *, key: undefined}}
+    */</span>
+  module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token keyword">function</span> <span class="token punctuation">(</span> sel<span class="token punctuation">,</span> data<span class="token punctuation">,</span> children<span class="token punctuation">,</span> text<span class="token punctuation">,</span> elm <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">var</span> key <span class="token operator">=</span> data <span class="token operator">===</span> undefined <span class="token operator">?</span> undefined <span class="token punctuation">:</span> data<span class="token punctuation">.</span>key<span class="token punctuation">;</span>
+      <span class="token keyword">return</span> <span class="token punctuation">{</span>
+        sel<span class="token punctuation">:</span> sel<span class="token punctuation">,</span> data<span class="token punctuation">:</span> data<span class="token punctuation">,</span> children<span class="token punctuation">:</span> children<span class="token punctuation">,</span>
+        text<span class="token punctuation">:</span> text<span class="token punctuation">,</span> elm<span class="token punctuation">:</span> elm<span class="token punctuation">,</span> key<span class="token punctuation">:</span> key
+      <span class="token punctuation">}</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre>
+<p>vnode主要有5大属性：</p>
 <ul>
 <li>sel 对应的是选择器,如’div’,’div#a’,’div#a.b.c’的形式</li>
 <li><p>data 对应的是vnode绑定的数据，可以有以下类型：attribute、props、eventlistner、<br>class、dataset、hook</p>
@@ -441,10 +600,69 @@
 <h2 id="第二站-h"><a href="#第二站-h" class="headerlink" title="第二站 h"></a>第二站 h</h2><p>说完vnode,就到h了，h也是一个包装函数，主要是在vnode上再做一层包装，实现功能如下</p>
 <ul>
 <li>如果是svg，则为其添加命名空间</li>
-<li><p>将children中的text包装成vnode形式</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> VNode = <span class="built_in">require</span> ( <span class="string">'./vnode'</span> );</div><div class="line"><span class="keyword">var</span> is = <span class="built_in">require</span> ( <span class="string">'./is'</span> );</div><div class="line"><span class="comment">//添加命名空间（svg才需要）</span></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">addNS</span> (<span class="params"> data, children, sel </span>) </span>&#123;</div><div class="line">	data.ns = <span class="string">'http://www.w3.org/2000/svg'</span>;</div><div class="line"><span class="comment">//如果选择器</span></div><div class="line">	<span class="keyword">if</span> ( sel !== <span class="string">'foreignObject'</span> &amp;&amp; children !== <span class="literal">undefined</span> ) &#123;</div><div class="line">		<span class="comment">//递归为子节点添加命名空间</span></div><div class="line">		<span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; children.length; ++i) &#123;</div><div class="line">			addNS ( children[ i ].data, children[ i ].children, children[ i ].sel );</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"><span class="comment">//将VNode渲染为VDOM</span></div><div class="line"><span class="comment">/**</span></div><div class="line"> *</div><div class="line"> * @param sel 选择器</div><div class="line"> * @param b	数据</div><div class="line"> * @param c	子节点</div><div class="line"> * @returns &#123;&#123;sel, data, children, text, elm, key&#125;&#125;</div><div class="line"> */</div><div class="line"><span class="built_in">module</span>.exports = <span class="function"><span class="keyword">function</span> <span class="title">h</span> (<span class="params"> sel, b, c </span>) </span>&#123;</div><div class="line">	<span class="keyword">var</span> data = &#123;&#125;, children, text, i;</div><div class="line">	<span class="comment">//如果存在子节点</span></div><div class="line">	<span class="keyword">if</span> ( c !== <span class="literal">undefined</span> ) &#123;</div><div class="line">		<span class="comment">//那么h的第二项就是data</span></div><div class="line">		data = b;</div><div class="line">		<span class="comment">//如果c是数组，那么存在子element节点</span></div><div class="line">		<span class="keyword">if</span> ( is.array ( c ) ) &#123;</div><div class="line">			children = c;</div><div class="line">		&#125;</div><div class="line">		<span class="comment">//否则为子text节点</span></div><div class="line">		<span class="keyword">else</span> <span class="keyword">if</span> ( is.primitive ( c ) ) &#123;</div><div class="line">			text = c;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	<span class="comment">//如果c不存在，只存在b，那么说明需要渲染的vdom不存在data部分，只存在子节点部分</span></div><div class="line">	<span class="keyword">else</span> <span class="keyword">if</span> ( b !== <span class="literal">undefined</span> ) &#123;</div><div class="line">		<span class="keyword">if</span> ( is.array ( b ) ) &#123;</div><div class="line">			children = b;</div><div class="line">		&#125;</div><div class="line">		<span class="keyword">else</span> <span class="keyword">if</span> ( is.primitive ( b ) ) &#123;</div><div class="line">			text = b;</div><div class="line">		&#125;</div><div class="line">		<span class="keyword">else</span> &#123;</div><div class="line">			data = b;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	<span class="keyword">if</span> ( is.array ( children ) ) &#123;</div><div class="line">		<span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; children.length; ++i) &#123;</div><div class="line">			<span class="comment">//如果子节点数组中，存在节点是原始类型，说明该节点是text节点，因此我们将它渲染为一个只包含text的VNode</span></div><div class="line">			<span class="keyword">if</span> ( is.primitive ( children[ i ] ) ) children[ i ] = VNode ( <span class="literal">undefined</span>, <span class="literal">undefined</span>, <span class="literal">undefined</span>, children[ i ] );</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	<span class="comment">//如果是svg，需要为节点添加命名空间</span></div><div class="line">	<span class="keyword">if</span> ( sel[ <span class="number">0</span> ] === <span class="string">'s'</span> &amp;&amp; sel[ <span class="number">1</span> ] === <span class="string">'v'</span> &amp;&amp; sel[ <span class="number">2</span> ] === <span class="string">'g'</span> ) &#123;</div><div class="line">		addNS ( data, children, sel );</div><div class="line">	&#125;</div><div class="line">	<span class="keyword">return</span> VNode ( sel, data, children, text, <span class="literal">undefined</span> );</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
-</li>
+<li>将children中的text包装成vnode形式</li>
 </ul>
+<pre class=" language-javascript"><code class="language-javascript">  <span class="token keyword">var</span> VNode <span class="token operator">=</span> require <span class="token punctuation">(</span> <span class="token string">'./vnode'</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">var</span> is <span class="token operator">=</span> require <span class="token punctuation">(</span> <span class="token string">'./is'</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//添加命名空间（svg才需要）</span>
+  <span class="token keyword">function</span> addNS <span class="token punctuation">(</span> data<span class="token punctuation">,</span> children<span class="token punctuation">,</span> sel <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    data<span class="token punctuation">.</span>ns <span class="token operator">=</span> <span class="token string">'http://www.w3.org/2000/svg'</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//如果选择器</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span> sel <span class="token operator">!==</span> <span class="token string">'foreignObject'</span> <span class="token operator">&amp;&amp;</span> children <span class="token operator">!==</span> undefined <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//递归为子节点添加命名空间</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">var</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> children<span class="token punctuation">.</span>length<span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            addNS <span class="token punctuation">(</span> children<span class="token punctuation">[</span> i <span class="token punctuation">]</span><span class="token punctuation">.</span>data<span class="token punctuation">,</span> children<span class="token punctuation">[</span> i <span class="token punctuation">]</span><span class="token punctuation">.</span>children<span class="token punctuation">,</span> children<span class="token punctuation">[</span> i <span class="token punctuation">]</span><span class="token punctuation">.</span>sel <span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token comment" spellcheck="true">/**
+    * 将VNode渲染为VDOM
+    * @param sel 选择器
+    * @param b    数据
+    * @param c    子节点
+    * @returns {{sel, data, children, text, elm, key}}
+    */</span>
+  module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token keyword">function</span> h <span class="token punctuation">(</span> sel<span class="token punctuation">,</span> b<span class="token punctuation">,</span> c <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">var</span> data <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span> children<span class="token punctuation">,</span> text<span class="token punctuation">,</span> i<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//如果存在子节点</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span> c <span class="token operator">!==</span> undefined <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//那么h的第二项就是data</span>
+        data <span class="token operator">=</span> b<span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//如果c是数组，那么存在子element节点</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span> is<span class="token punctuation">.</span>array <span class="token punctuation">(</span> c <span class="token punctuation">)</span> <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            children <span class="token operator">=</span> c<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token comment" spellcheck="true">//否则为子text节点</span>
+        <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span> is<span class="token punctuation">.</span>primitive <span class="token punctuation">(</span> c <span class="token punctuation">)</span> <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            text <span class="token operator">=</span> c<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">//如果c不存在，只存在b，那么说明需要渲染的vdom不存在data部分，只存在子节点部分</span>
+    <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span> b <span class="token operator">!==</span> undefined <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span> is<span class="token punctuation">.</span>array <span class="token punctuation">(</span> b <span class="token punctuation">)</span> <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            children <span class="token operator">=</span> b<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span> is<span class="token punctuation">.</span>primitive <span class="token punctuation">(</span> b <span class="token punctuation">)</span> <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            text <span class="token operator">=</span> b<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            data <span class="token operator">=</span> b<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span> is<span class="token punctuation">.</span>array <span class="token punctuation">(</span> children <span class="token punctuation">)</span> <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span>i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> children<span class="token punctuation">.</span>length<span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//如果子节点数组中，存在节点是原始类型，说明该节点是text节点，因此我们将它渲染为一个只包含text的VNode</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span> is<span class="token punctuation">.</span>primitive <span class="token punctuation">(</span> children<span class="token punctuation">[</span> i <span class="token punctuation">]</span> <span class="token punctuation">)</span> <span class="token punctuation">)</span> children<span class="token punctuation">[</span> i <span class="token punctuation">]</span> <span class="token operator">=</span> VNode <span class="token punctuation">(</span> undefined<span class="token punctuation">,</span> undefined<span class="token punctuation">,</span> undefined<span class="token punctuation">,</span> children<span class="token punctuation">[</span> i <span class="token punctuation">]</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">//如果是svg，需要为节点添加命名空间</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span> sel<span class="token punctuation">[</span> <span class="token number">0</span> <span class="token punctuation">]</span> <span class="token operator">===</span> <span class="token string">'s'</span> <span class="token operator">&amp;&amp;</span> sel<span class="token punctuation">[</span> <span class="token number">1</span> <span class="token punctuation">]</span> <span class="token operator">===</span> <span class="token string">'v'</span> <span class="token operator">&amp;&amp;</span> sel<span class="token punctuation">[</span> <span class="token number">2</span> <span class="token punctuation">]</span> <span class="token operator">===</span> <span class="token string">'g'</span> <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        addNS <span class="token punctuation">(</span> data<span class="token punctuation">,</span> children<span class="token punctuation">,</span> sel <span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> VNode <span class="token punctuation">(</span> sel<span class="token punctuation">,</span> data<span class="token punctuation">,</span> children<span class="token punctuation">,</span> text<span class="token punctuation">,</span> undefined <span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre>
 <h2 id="第三站-htmldomapi"><a href="#第三站-htmldomapi" class="headerlink" title="第三站 htmldomapi"></a>第三站 htmldomapi</h2><p>htmldomapi中提供了对原生dom操作的一层抽象，这里就不再阐述了</p>
 <h2 id="第四站-modules"><a href="#第四站-modules" class="headerlink" title="第四站 modules"></a>第四站 modules</h2><p>modules中主要包含attributes，class，props，dataset，eventlistener，hero，style<br>这些模块，其中attributes,class,props,dataset,eventlistener,style这些模块是我们<br>日常所需要的，也是snabbdom.bundle默认注入的也是这几个，这里就详细介绍这几个模块</p>
 <h3 id="attributes"><a href="#attributes" class="headerlink" title="attributes"></a>attributes</h3><p>主要功能如下：</p>
@@ -452,281 +670,694 @@
 <li>从elm的属性中删除vnode中不存在的属性（包括那些boolean类属性，如果新vnode设置为false，同样删除）</li>
 <li>如果oldvnode与vnode用同名属性，则在elm上更新对应属性值</li>
 <li>如果vnode有新属性，则添加到elm中</li>
-<li><p>如果存在命名空间，则用<code>setAttributeNS</code>设置</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> NamespaceURIs = &#123;</div><div class="line">  <span class="string">"xlink"</span>: <span class="string">"http://www.w3.org/1999/xlink"</span></div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">var</span> booleanAttrs = [<span class="string">"allowfullscreen"</span>, <span class="string">"async"</span>, <span class="string">"autofocus"</span>, <span class="string">"autoplay"</span>, <span class="string">"checked"</span>, <span class="string">"compact"</span>, <span class="string">"controls"</span>, <span class="string">"declare"</span>,</div><div class="line">                <span class="string">"default"</span>, <span class="string">"defaultchecked"</span>, <span class="string">"defaultmuted"</span>, <span class="string">"defaultselected"</span>, <span class="string">"defer"</span>, <span class="string">"disabled"</span>, <span class="string">"draggable"</span>,</div><div class="line">                <span class="string">"enabled"</span>, <span class="string">"formnovalidate"</span>, <span class="string">"hidden"</span>, <span class="string">"indeterminate"</span>, <span class="string">"inert"</span>, <span class="string">"ismap"</span>, <span class="string">"itemscope"</span>, <span class="string">"loop"</span>, <span class="string">"multiple"</span>,</div><div class="line">                <span class="string">"muted"</span>, <span class="string">"nohref"</span>, <span class="string">"noresize"</span>, <span class="string">"noshade"</span>, <span class="string">"novalidate"</span>, <span class="string">"nowrap"</span>, <span class="string">"open"</span>, <span class="string">"pauseonexit"</span>, <span class="string">"readonly"</span>,</div><div class="line">                <span class="string">"required"</span>, <span class="string">"reversed"</span>, <span class="string">"scoped"</span>, <span class="string">"seamless"</span>, <span class="string">"selected"</span>, <span class="string">"sortable"</span>, <span class="string">"spellcheck"</span>, <span class="string">"translate"</span>,</div><div class="line">                <span class="string">"truespeed"</span>, <span class="string">"typemustmatch"</span>, <span class="string">"visible"</span>];</div><div class="line"></div><div class="line"><span class="keyword">var</span> booleanAttrsDict = <span class="built_in">Object</span>.create(<span class="literal">null</span>);</div><div class="line"></div><div class="line"><span class="comment">//创建属性字典，默认为true</span></div><div class="line"><span class="keyword">for</span>(<span class="keyword">var</span> i=<span class="number">0</span>, len = booleanAttrs.length; i &lt; len; i++) &#123;</div><div class="line">  booleanAttrsDict[booleanAttrs[i]] = <span class="literal">true</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">updateAttrs</span>(<span class="params">oldVnode, vnode</span>) </span>&#123;</div><div class="line">  <span class="keyword">var</span> key, cur, old, elm = vnode.elm,</div><div class="line">      oldAttrs = oldVnode.data.attrs, attrs = vnode.data.attrs, namespaceSplit;</div><div class="line"></div><div class="line"></div><div class="line">  <span class="comment">//如果旧节点和新节点都不包含属性，立刻返回</span></div><div class="line">  <span class="keyword">if</span> (!oldAttrs &amp;&amp; !attrs) <span class="keyword">return</span>;</div><div class="line">  oldAttrs = oldAttrs || &#123;&#125;;</div><div class="line">  attrs = attrs || &#123;&#125;;</div><div class="line"></div><div class="line">  <span class="comment">// update modified attributes, add new attributes</span></div><div class="line">  <span class="comment">//更新改变了的属性，添加新的属性</span></div><div class="line">  <span class="keyword">for</span> (key <span class="keyword">in</span> attrs) &#123;</div><div class="line">    cur = attrs[key];</div><div class="line">    old = oldAttrs[key];</div><div class="line">    <span class="comment">//如果旧的属性和新的属性不同</span></div><div class="line">    <span class="keyword">if</span> (old !== cur) &#123;</div><div class="line">    <span class="comment">//如果是boolean类属性，当vnode设置为falsy value时，直接删除，而不是更新值</span></div><div class="line">      <span class="keyword">if</span>(!cur &amp;&amp; booleanAttrsDict[key])</div><div class="line">        elm.removeAttribute(key);</div><div class="line">      <span class="keyword">else</span> &#123;</div><div class="line">        <span class="comment">//否则更新属性值或者添加属性</span></div><div class="line">        <span class="comment">//如果存在命名空间</span></div><div class="line">        namespaceSplit = key.split(<span class="string">":"</span>);</div><div class="line">        <span class="keyword">if</span>(namespaceSplit.length &gt; <span class="number">1</span> &amp;&amp; NamespaceURIs.hasOwnProperty(namespaceSplit[<span class="number">0</span>]))</div><div class="line">          elm.setAttributeNS(NamespaceURIs[namespaceSplit[<span class="number">0</span>]], key, cur);</div><div class="line">        <span class="keyword">else</span></div><div class="line">          elm.setAttribute(key, cur);</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  <span class="comment">//remove removed attributes</span></div><div class="line">  <span class="comment">// use `in` operator since the previous `for` iteration uses it (.i.e. add even attributes with undefined value)</span></div><div class="line">  <span class="comment">// the other option is to remove all attributes with value == undefined</span></div><div class="line">  <span class="comment">//删除不在新节点属性中的旧节点的属性</span></div><div class="line">  <span class="keyword">for</span> (key <span class="keyword">in</span> oldAttrs) &#123;</div><div class="line">    <span class="keyword">if</span> (!(key <span class="keyword">in</span> attrs)) &#123;</div><div class="line">      elm.removeAttribute(key);</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">module</span>.exports = &#123;<span class="attr">create</span>: updateAttrs, <span class="attr">update</span>: updateAttrs&#125;;</div></pre></td></tr></table></figure>
-</li>
+<li>如果存在命名空间，则用<code>setAttributeNS</code>设置</li>
 </ul>
+<pre class=" language-javascript"><code class="language-javascript">  <span class="token keyword">var</span> NamespaceURIs <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token string">"xlink"</span><span class="token punctuation">:</span> <span class="token string">"http://www.w3.org/1999/xlink"</span>
+  <span class="token punctuation">}</span><span class="token punctuation">;</span>
+  <span class="token keyword">var</span> booleanAttrs <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">"allowfullscreen"</span><span class="token punctuation">,</span> <span class="token string">"async"</span><span class="token punctuation">,</span> <span class="token string">"autofocus"</span><span class="token punctuation">,</span> <span class="token string">"autoplay"</span><span class="token punctuation">,</span> <span class="token string">"checked"</span><span class="token punctuation">,</span> <span class="token string">"compact"</span><span class="token punctuation">,</span> <span class="token string">"controls"</span><span class="token punctuation">,</span> <span class="token string">"declare"</span><span class="token punctuation">,</span>
+                    <span class="token string">"default"</span><span class="token punctuation">,</span> <span class="token string">"defaultchecked"</span><span class="token punctuation">,</span> <span class="token string">"defaultmuted"</span><span class="token punctuation">,</span> <span class="token string">"defaultselected"</span><span class="token punctuation">,</span> <span class="token string">"defer"</span><span class="token punctuation">,</span> <span class="token string">"disabled"</span><span class="token punctuation">,</span> <span class="token string">"draggable"</span><span class="token punctuation">,</span>
+                    <span class="token string">"enabled"</span><span class="token punctuation">,</span> <span class="token string">"formnovalidate"</span><span class="token punctuation">,</span> <span class="token string">"hidden"</span><span class="token punctuation">,</span> <span class="token string">"indeterminate"</span><span class="token punctuation">,</span> <span class="token string">"inert"</span><span class="token punctuation">,</span> <span class="token string">"ismap"</span><span class="token punctuation">,</span> <span class="token string">"itemscope"</span><span class="token punctuation">,</span> <span class="token string">"loop"</span><span class="token punctuation">,</span> <span class="token string">"multiple"</span><span class="token punctuation">,</span>
+                    <span class="token string">"muted"</span><span class="token punctuation">,</span> <span class="token string">"nohref"</span><span class="token punctuation">,</span> <span class="token string">"noresize"</span><span class="token punctuation">,</span> <span class="token string">"noshade"</span><span class="token punctuation">,</span> <span class="token string">"novalidate"</span><span class="token punctuation">,</span> <span class="token string">"nowrap"</span><span class="token punctuation">,</span> <span class="token string">"open"</span><span class="token punctuation">,</span> <span class="token string">"pauseonexit"</span><span class="token punctuation">,</span> <span class="token string">"readonly"</span><span class="token punctuation">,</span>
+                    <span class="token string">"required"</span><span class="token punctuation">,</span> <span class="token string">"reversed"</span><span class="token punctuation">,</span> <span class="token string">"scoped"</span><span class="token punctuation">,</span> <span class="token string">"seamless"</span><span class="token punctuation">,</span> <span class="token string">"selected"</span><span class="token punctuation">,</span> <span class="token string">"sortable"</span><span class="token punctuation">,</span> <span class="token string">"spellcheck"</span><span class="token punctuation">,</span> <span class="token string">"translate"</span><span class="token punctuation">,</span>
+                    <span class="token string">"truespeed"</span><span class="token punctuation">,</span> <span class="token string">"typemustmatch"</span><span class="token punctuation">,</span> <span class="token string">"visible"</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">var</span> booleanAttrsDict <span class="token operator">=</span> Object<span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span><span class="token keyword">null</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment" spellcheck="true">//创建属性字典，默认为true</span>
+  <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">var</span> i<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">,</span> len <span class="token operator">=</span> booleanAttrs<span class="token punctuation">.</span>length<span class="token punctuation">;</span> i <span class="token operator">&lt;</span> len<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    booleanAttrsDict<span class="token punctuation">[</span>booleanAttrs<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">function</span> <span class="token function">updateAttrs</span><span class="token punctuation">(</span>oldVnode<span class="token punctuation">,</span> vnode<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">var</span> key<span class="token punctuation">,</span> cur<span class="token punctuation">,</span> old<span class="token punctuation">,</span> elm <span class="token operator">=</span> vnode<span class="token punctuation">.</span>elm<span class="token punctuation">,</span>
+      oldAttrs <span class="token operator">=</span> oldVnode<span class="token punctuation">.</span>data<span class="token punctuation">.</span>attrs<span class="token punctuation">,</span> attrs <span class="token operator">=</span> vnode<span class="token punctuation">.</span>data<span class="token punctuation">.</span>attrs<span class="token punctuation">,</span> namespaceSplit<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//如果旧节点和新节点都不包含属性，立刻返回</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>oldAttrs <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>attrs<span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span>
+    oldAttrs <span class="token operator">=</span> oldAttrs <span class="token operator">||</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+    attrs <span class="token operator">=</span> attrs <span class="token operator">||</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">// update modified attributes, add new attributes</span>
+    <span class="token comment" spellcheck="true">//更新改变了的属性，添加新的属性</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>key <span class="token keyword">in</span> attrs<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      cur <span class="token operator">=</span> attrs<span class="token punctuation">[</span>key<span class="token punctuation">]</span><span class="token punctuation">;</span>
+      old <span class="token operator">=</span> oldAttrs<span class="token punctuation">[</span>key<span class="token punctuation">]</span><span class="token punctuation">;</span>
+      <span class="token comment" spellcheck="true">//如果旧的属性和新的属性不同</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>old <span class="token operator">!==</span> cur<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token comment" spellcheck="true">//如果是boolean类属性，当vnode设置为falsy value时，直接删除，而不是更新值</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span>cur <span class="token operator">&amp;&amp;</span> booleanAttrsDict<span class="token punctuation">[</span>key<span class="token punctuation">]</span><span class="token punctuation">)</span>
+          elm<span class="token punctuation">.</span><span class="token function">removeAttribute</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">else</span> <span class="token punctuation">{</span>
+          <span class="token comment" spellcheck="true">//否则更新属性值或者添加属性</span>
+          <span class="token comment" spellcheck="true">//如果存在命名空间</span>
+          namespaceSplit <span class="token operator">=</span> key<span class="token punctuation">.</span><span class="token function">split</span><span class="token punctuation">(</span><span class="token string">":"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+          <span class="token keyword">if</span><span class="token punctuation">(</span>namespaceSplit<span class="token punctuation">.</span>length <span class="token operator">></span> <span class="token number">1</span> <span class="token operator">&amp;&amp;</span> NamespaceURIs<span class="token punctuation">.</span><span class="token function">hasOwnProperty</span><span class="token punctuation">(</span>namespaceSplit<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+            elm<span class="token punctuation">.</span><span class="token function">setAttributeNS</span><span class="token punctuation">(</span>NamespaceURIs<span class="token punctuation">[</span>namespaceSplit<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">,</span> key<span class="token punctuation">,</span> cur<span class="token punctuation">)</span><span class="token punctuation">;</span>
+          <span class="token keyword">else</span>
+            elm<span class="token punctuation">.</span><span class="token function">setAttribute</span><span class="token punctuation">(</span>key<span class="token punctuation">,</span> cur<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">//remove removed attributes</span>
+    <span class="token comment" spellcheck="true">// use `in` operator since the previous `for` iteration uses it (.i.e. add even attributes with undefined value)</span>
+    <span class="token comment" spellcheck="true">// the other option is to remove all attributes with value == undefined</span>
+    <span class="token comment" spellcheck="true">//删除不在新节点属性中的旧节点的属性</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>key <span class="token keyword">in</span> oldAttrs<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token punctuation">(</span>key <span class="token keyword">in</span> attrs<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        elm<span class="token punctuation">.</span><span class="token function">removeAttribute</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+  module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">{</span>create<span class="token punctuation">:</span> updateAttrs<span class="token punctuation">,</span> update<span class="token punctuation">:</span> updateAttrs<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre>
 <h3 id="class"><a href="#class" class="headerlink" title="class"></a>class</h3><p>主要功能如下：</p>
 <ul>
 <li>从elm中删除vnode中不存在的或者值为false的类</li>
-<li><p>将vnode中新的class添加到elm上去</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">updateClass</span>(<span class="params">oldVnode, vnode</span>) </span>&#123;</div><div class="line">  <span class="keyword">var</span> cur, name, elm = vnode.elm,</div><div class="line">      oldClass = oldVnode.data.class,</div><div class="line">      klass = vnode.data.class;</div><div class="line">  <span class="comment">//如果旧节点和新节点都没有class，直接返回</span></div><div class="line">  <span class="keyword">if</span> (!oldClass &amp;&amp; !klass) <span class="keyword">return</span>;</div><div class="line">  oldClass = oldClass || &#123;&#125;;</div><div class="line">  klass = klass || &#123;&#125;;</div><div class="line">  <span class="comment">//从旧节点中删除新节点不存在的类</span></div><div class="line">  <span class="keyword">for</span> (name <span class="keyword">in</span> oldClass) &#123;</div><div class="line">    <span class="keyword">if</span> (!klass[name]) &#123;</div><div class="line">      elm.classList.remove(name);</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  <span class="comment">//如果新节点中对应旧节点的类设置为false，则删除该类，如果新设置为true，则添加该类</span></div><div class="line">  <span class="keyword">for</span> (name <span class="keyword">in</span> klass) &#123;</div><div class="line">    cur = klass[name];</div><div class="line">    <span class="keyword">if</span> (cur !== oldClass[name]) &#123;</div><div class="line">      elm.classList[cur ? <span class="string">'add'</span> : <span class="string">'remove'</span>](name);</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">module</span>.exports = &#123;<span class="attr">create</span>: updateClass, <span class="attr">update</span>: updateClass&#125;;</div></pre></td></tr></table></figure>
-</li>
+<li>将vnode中新的class添加到elm上去</li>
 </ul>
+<pre class=" language-javascript"><code class="language-javascript">  <span class="token keyword">function</span> <span class="token function">updateClass</span><span class="token punctuation">(</span>oldVnode<span class="token punctuation">,</span> vnode<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">var</span> cur<span class="token punctuation">,</span> name<span class="token punctuation">,</span> elm <span class="token operator">=</span> vnode<span class="token punctuation">.</span>elm<span class="token punctuation">,</span>
+        oldClass <span class="token operator">=</span> oldVnode<span class="token punctuation">.</span>data<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">,</span>
+        klass <span class="token operator">=</span> vnode<span class="token punctuation">.</span>data<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//如果旧节点和新节点都没有class，直接返回</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>oldClass <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>klass<span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span>
+    oldClass <span class="token operator">=</span> oldClass <span class="token operator">||</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+    klass <span class="token operator">=</span> klass <span class="token operator">||</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//从旧节点中删除新节点不存在的类</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>name <span class="token keyword">in</span> oldClass<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>klass<span class="token punctuation">[</span>name<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        elm<span class="token punctuation">.</span>classList<span class="token punctuation">.</span><span class="token function">remove</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">//如果新节点中对应旧节点的类设置为false，则删除该类，如果新设置为true，则添加该类</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>name <span class="token keyword">in</span> klass<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      cur <span class="token operator">=</span> klass<span class="token punctuation">[</span>name<span class="token punctuation">]</span><span class="token punctuation">;</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>cur <span class="token operator">!==</span> oldClass<span class="token punctuation">[</span>name<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        elm<span class="token punctuation">.</span>classList<span class="token punctuation">[</span>cur <span class="token operator">?</span> <span class="token string">'add'</span> <span class="token punctuation">:</span> <span class="token string">'remove'</span><span class="token punctuation">]</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+  module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">{</span>create<span class="token punctuation">:</span> updateClass<span class="token punctuation">,</span> update<span class="token punctuation">:</span> updateClass<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre>
 <h3 id="dataset"><a href="#dataset" class="headerlink" title="dataset"></a>dataset</h3><p>主要功能如下：</p>
 <ul>
 <li>从elm中删除vnode不存在的属性集中的属性</li>
-<li><p>更新属性集中的属性值</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">updateDataset</span>(<span class="params">oldVnode, vnode</span>) </span>&#123;</div><div class="line">  <span class="keyword">var</span> elm = vnode.elm,</div><div class="line">    oldDataset = oldVnode.data.dataset,</div><div class="line">    dataset = vnode.data.dataset,</div><div class="line">    key</div><div class="line"></div><div class="line">  <span class="comment">//如果新旧节点都没数据集，则直接返回</span></div><div class="line">  <span class="keyword">if</span> (!oldDataset &amp;&amp; !dataset) <span class="keyword">return</span>;</div><div class="line">  oldDataset = oldDataset || &#123;&#125;;</div><div class="line">  dataset = dataset || &#123;&#125;;</div><div class="line"> <span class="comment">//删除旧节点中在新节点不存在的数据集</span></div><div class="line">  <span class="keyword">for</span> (key <span class="keyword">in</span> oldDataset) &#123;</div><div class="line">    <span class="keyword">if</span> (!dataset[key]) &#123;</div><div class="line">      <span class="keyword">delete</span> elm.dataset[key];</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  <span class="comment">//更新数据集</span></div><div class="line">  <span class="keyword">for</span> (key <span class="keyword">in</span> dataset) &#123;</div><div class="line">    <span class="keyword">if</span> (oldDataset[key] !== dataset[key]) &#123;</div><div class="line">      elm.dataset[key] = dataset[key];</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">module</span>.exports = &#123;<span class="attr">create</span>: updateDataset, <span class="attr">update</span>: updateDataset&#125;</div></pre></td></tr></table></figure>
-</li>
+<li>更新属性集中的属性值</li>
 </ul>
+<pre class=" language-javascript"><code class="language-javascript">  <span class="token keyword">function</span> <span class="token function">updateDataset</span><span class="token punctuation">(</span>oldVnode<span class="token punctuation">,</span> vnode<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">var</span> elm <span class="token operator">=</span> vnode<span class="token punctuation">.</span>elm<span class="token punctuation">,</span>
+      oldDataset <span class="token operator">=</span> oldVnode<span class="token punctuation">.</span>data<span class="token punctuation">.</span>dataset<span class="token punctuation">,</span>
+      dataset <span class="token operator">=</span> vnode<span class="token punctuation">.</span>data<span class="token punctuation">.</span>dataset<span class="token punctuation">,</span>
+      key
+    <span class="token comment" spellcheck="true">//如果新旧节点都没数据集，则直接返回</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>oldDataset <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>dataset<span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span>
+    oldDataset <span class="token operator">=</span> oldDataset <span class="token operator">||</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+    dataset <span class="token operator">=</span> dataset <span class="token operator">||</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//删除旧节点中在新节点不存在的数据集</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>key <span class="token keyword">in</span> oldDataset<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>dataset<span class="token punctuation">[</span>key<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">delete</span> elm<span class="token punctuation">.</span>dataset<span class="token punctuation">[</span>key<span class="token punctuation">]</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">//更新数据集</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>key <span class="token keyword">in</span> dataset<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>oldDataset<span class="token punctuation">[</span>key<span class="token punctuation">]</span> <span class="token operator">!==</span> dataset<span class="token punctuation">[</span>key<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        elm<span class="token punctuation">.</span>dataset<span class="token punctuation">[</span>key<span class="token punctuation">]</span> <span class="token operator">=</span> dataset<span class="token punctuation">[</span>key<span class="token punctuation">]</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+     <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+  module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">{</span>create<span class="token punctuation">:</span> updateDataset<span class="token punctuation">,</span> update<span class="token punctuation">:</span> updateDataset<span class="token punctuation">}</span>
+</code></pre>
 <h3 id="eventlistener"><a href="#eventlistener" class="headerlink" title="eventlistener"></a>eventlistener</h3><p>snabbdom中对事件处理做了一层包装，真实DOM的事件触发的是对vnode的操作,主要途径是:</p>
 <p>createListner =&gt; 返回handler作事件监听生成器 =&gt;handler上绑定vnode =&gt;将handler作真实DOM的事件处理器<br>真实DOM事件触发后 =&gt; handler获得真实DOM的事件对象 =&gt; 将真实DOM事件对象传入handleEvent =&gt; handleEvent找到<br>对应的vnode事件处理器，然后调用这个处理器从而修改vnode</p>
-<pre><code><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//snabbdom中对事件处理做了一层包装，真实DOM的事件触发的是对vnode的操作</span></div><div class="line"><span class="comment">//主要途径是</span></div><div class="line"><span class="comment">// createListner =&gt; 返回handler作事件监听生成器 =&gt;handler上绑定vnode =&gt;将handler作真实DOM的事件处理器</span></div><div class="line"><span class="comment">//真实DOM事件触发后 =&gt; handler获得真实DOM的事件对象 =&gt; 将真实DOM事件对象传入handleEvent =&gt; handleEvent找到</span></div><div class="line"><span class="comment">//对应的vnode事件处理器，然后调用这个处理器从而修改vnode</span></div><div class="line"></div><div class="line"><span class="comment">//对vnode进行事件处理</span></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">invokeHandler</span> (<span class="params"> handler, vnode, event </span>) </span>&#123;</div><div class="line">	<span class="keyword">if</span> ( <span class="keyword">typeof</span> handler === <span class="string">"function"</span> ) &#123;</div><div class="line">		<span class="comment">// call function handler</span></div><div class="line">		<span class="comment">//将事件处理器在vnode上调用</span></div><div class="line">		handler.call ( vnode, event, vnode );</div><div class="line">	&#125;</div><div class="line">	<span class="comment">//存在事件绑定数据或者存在多事件处理器</span></div><div class="line">	<span class="keyword">else</span> <span class="keyword">if</span> ( <span class="keyword">typeof</span> handler === <span class="string">"object"</span> ) &#123;</div><div class="line"></div><div class="line">		<span class="comment">//说明只有一个事件处理器</span></div><div class="line">		<span class="keyword">if</span> ( <span class="keyword">typeof</span> handler[ <span class="number">0</span> ] === <span class="string">"function"</span> ) &#123;</div><div class="line">			<span class="comment">//如果绑定数据只有一个，则直接将数据用call的方式调用，提高性能</span></div><div class="line">			<span class="comment">//形如on:&#123;click:[handler,1]&#125;</span></div><div class="line">			<span class="keyword">if</span> ( handler.length === <span class="number">2</span> ) &#123;</div><div class="line">				handler[ <span class="number">0</span> ].call ( vnode, handler[ <span class="number">1</span> ], event, vnode );</div><div class="line">			&#125;</div><div class="line">			<span class="comment">//如果存在多个绑定数据，则要转化为数组，用apply的方式调用，而apply性能比call差</span></div><div class="line">			<span class="comment">//形如:on:&#123;click:[handler,1,2,3]&#125;</span></div><div class="line">			<span class="keyword">else</span> &#123;</div><div class="line">				<span class="keyword">var</span> args = handler.slice ( <span class="number">1</span> );</div><div class="line">				args.push ( event );</div><div class="line">				args.push ( vnode );</div><div class="line">				handler[ <span class="number">0</span> ].apply ( vnode, args );</div><div class="line">			&#125;</div><div class="line">		&#125; <span class="keyword">else</span> &#123;</div><div class="line">			<span class="comment">//如果存在多个相同事件的不同处理器，则递归调用</span></div><div class="line">			<span class="comment">//如on：&#123;click:[[handeler1,1],[handler,2]]&#125;</span></div><div class="line">			<span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; handler.length; i++) &#123;</div><div class="line">				invokeHandler ( handler[ i ] );</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">/**</span></div><div class="line"> *</div><div class="line"> * @param event 真实dom的事件对象</div><div class="line"> * @param vnode</div><div class="line"> */</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">handleEvent</span> (<span class="params"> event, vnode </span>) </span>&#123;</div><div class="line">	<span class="keyword">var</span> name = event.type,</div><div class="line">		on = vnode.data.on;</div><div class="line"></div><div class="line">	<span class="comment">// 如果找到对应的vnode事件处理器，则调用</span></div><div class="line">	<span class="keyword">if</span> ( on &amp;&amp; on[ name ] ) &#123;</div><div class="line">		invokeHandler ( on[ name ], vnode, event );</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"><span class="comment">//事件监听器生成器，用于处理真实DOM事件</span></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">createListener</span> (<span class="params"></span>) </span>&#123;</div><div class="line">	<span class="keyword">return</span> <span class="function"><span class="keyword">function</span> <span class="title">handler</span> (<span class="params"> event </span>) </span>&#123;</div><div class="line">		handleEvent ( event, handler.vnode );</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"><span class="comment">//更新事件监听</span></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">updateEventListeners</span> (<span class="params"> oldVnode, vnode </span>) </span>&#123;</div><div class="line">	<span class="keyword">var</span> oldOn = oldVnode.data.on,</div><div class="line">		oldListener = oldVnode.listener,</div><div class="line">		oldElm = oldVnode.elm,</div><div class="line">		on = vnode &amp;&amp; vnode.data.on,</div><div class="line">		elm = vnode &amp;&amp; vnode.elm,</div><div class="line">		name;</div><div class="line"></div><div class="line">	<span class="comment">// optimization for reused immutable handlers</span></div><div class="line">	<span class="comment">//如果新旧事件监听器一样，则直接返回</span></div><div class="line">	<span class="keyword">if</span> ( oldOn === on ) &#123;</div><div class="line">		<span class="keyword">return</span>;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="comment">// remove existing listeners which no longer used</span></div><div class="line">	<span class="comment">//如果新节点上没有事件监听，则将旧节点上的事件监听都删除</span></div><div class="line">	<span class="keyword">if</span> ( oldOn &amp;&amp; oldListener ) &#123;</div><div class="line">		<span class="comment">// if element changed or deleted we remove all existing listeners unconditionally</span></div><div class="line">		<span class="keyword">if</span> ( !on ) &#123;</div><div class="line">			<span class="keyword">for</span> (name <span class="keyword">in</span> oldOn) &#123;</div><div class="line">				<span class="comment">// remove listener if element was changed or existing listeners removed</span></div><div class="line">				oldElm.removeEventListener ( name, oldListener, <span class="literal">false</span> );</div><div class="line">			&#125;</div><div class="line">		&#125; <span class="keyword">else</span> &#123;</div><div class="line">			<span class="comment">//删除旧节点中新节点不存在的事件监听</span></div><div class="line">			<span class="keyword">for</span> (name <span class="keyword">in</span> oldOn) &#123;</div><div class="line">				<span class="comment">// remove listener if existing listener removed</span></div><div class="line">				<span class="keyword">if</span> ( !on[ name ] ) &#123;</div><div class="line">					oldElm.removeEventListener ( name, oldListener, <span class="literal">false</span> );</div><div class="line">				&#125;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="comment">// add new listeners which has not already attached</span></div><div class="line">	<span class="keyword">if</span> ( on ) &#123;</div><div class="line">		<span class="comment">// reuse existing listener or create new</span></div><div class="line">		<span class="comment">//如果oldvnode上已经有listener，则vnode直接复用，否则则新建事件处理器</span></div><div class="line">		<span class="keyword">var</span> listener = vnode.listener = oldVnode.listener || createListener ();</div><div class="line">		<span class="comment">// update vnode for listener</span></div><div class="line">		<span class="comment">//在事件处理器上绑定vnode</span></div><div class="line">		listener.vnode = vnode;</div><div class="line"></div><div class="line">		<span class="comment">// if element changed or added we add all needed listeners unconditionally‘</span></div><div class="line">		<span class="comment">//如果oldvnode上没有事件处理器</span></div><div class="line">		<span class="keyword">if</span> ( !oldOn ) &#123;</div><div class="line">			<span class="keyword">for</span> (name <span class="keyword">in</span> on) &#123;</div><div class="line">				<span class="comment">// add listener if element was changed or new listeners added</span></div><div class="line">				<span class="comment">//直接将vnode上的事件处理器添加到elm上</span></div><div class="line">				elm.addEventListener ( name, listener, <span class="literal">false</span> );</div><div class="line">			&#125;</div><div class="line">		&#125; <span class="keyword">else</span> &#123;</div><div class="line">			<span class="keyword">for</span> (name <span class="keyword">in</span> on) &#123;</div><div class="line">				<span class="comment">// add listener if new listener added</span></div><div class="line">				<span class="comment">//否则添加oldvnode上没有的事件处理器</span></div><div class="line">				<span class="keyword">if</span> ( !oldOn[ name ] ) &#123;</div><div class="line">					elm.addEventListener ( name, listener, <span class="literal">false</span> );</div><div class="line">				&#125;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">module</span>.exports = &#123;</div><div class="line">	<span class="attr">create</span>: updateEventListeners,</div><div class="line">	<span class="attr">update</span>: updateEventListeners,</div><div class="line">	<span class="attr">destroy</span>: updateEventListeners</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
-</code></pre><h3 id="props"><a href="#props" class="headerlink" title="props"></a>props</h3><p>主要功能：</p>
+<pre class=" language-javascript"><code class="language-javascript">  <span class="token comment" spellcheck="true">//snabbdom中对事件处理做了一层包装，真实DOM的事件触发的是对vnode的操作</span>
+  <span class="token comment" spellcheck="true">//主要途径是</span>
+  <span class="token comment" spellcheck="true">// createListner => 返回handler作事件监听生成器 =>handler上绑定vnode =>将handler作真实DOM的事件处理器</span>
+  <span class="token comment" spellcheck="true">//真实DOM事件触发后 => handler获得真实DOM的事件对象 => 将真实DOM事件对象传入handleEvent => handleEvent找到</span>
+  <span class="token comment" spellcheck="true">//对应的vnode事件处理器，然后调用这个处理器从而修改vnode</span>
+  <span class="token comment" spellcheck="true">//对vnode进行事件处理</span>
+  <span class="token keyword">function</span> invokeHandler <span class="token punctuation">(</span> handler<span class="token punctuation">,</span> vnode<span class="token punctuation">,</span> event <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span> <span class="token keyword">typeof</span> handler <span class="token operator">===</span> <span class="token string">"function"</span> <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// call function handler</span>
+        <span class="token comment" spellcheck="true">//将事件处理器在vnode上调用</span>
+        handler<span class="token punctuation">.</span>call <span class="token punctuation">(</span> vnode<span class="token punctuation">,</span> event<span class="token punctuation">,</span> vnode <span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">//存在事件绑定数据或者存在多事件处理器</span>
+    <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span> <span class="token keyword">typeof</span> handler <span class="token operator">===</span> <span class="token string">"object"</span> <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//说明只有一个事件处理器</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span> <span class="token keyword">typeof</span> handler<span class="token punctuation">[</span> <span class="token number">0</span> <span class="token punctuation">]</span> <span class="token operator">===</span> <span class="token string">"function"</span> <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">//如果绑定数据只有一个，则直接将数据用call的方式调用，提高性能</span>
+            <span class="token comment" spellcheck="true">//形如on:{click:[handler,1]}</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span> handler<span class="token punctuation">.</span>length <span class="token operator">===</span> <span class="token number">2</span> <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                handler<span class="token punctuation">[</span> <span class="token number">0</span> <span class="token punctuation">]</span><span class="token punctuation">.</span>call <span class="token punctuation">(</span> vnode<span class="token punctuation">,</span> handler<span class="token punctuation">[</span> <span class="token number">1</span> <span class="token punctuation">]</span><span class="token punctuation">,</span> event<span class="token punctuation">,</span> vnode <span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            <span class="token comment" spellcheck="true">//如果存在多个绑定数据，则要转化为数组，用apply的方式调用，而apply性能比call差</span>
+            <span class="token comment" spellcheck="true">//形如:on:{click:[handler,1,2,3]}</span>
+            <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                <span class="token keyword">var</span> args <span class="token operator">=</span> handler<span class="token punctuation">.</span>slice <span class="token punctuation">(</span> <span class="token number">1</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
+                args<span class="token punctuation">.</span>push <span class="token punctuation">(</span> event <span class="token punctuation">)</span><span class="token punctuation">;</span>
+                args<span class="token punctuation">.</span>push <span class="token punctuation">(</span> vnode <span class="token punctuation">)</span><span class="token punctuation">;</span>
+                handler<span class="token punctuation">[</span> <span class="token number">0</span> <span class="token punctuation">]</span><span class="token punctuation">.</span>apply <span class="token punctuation">(</span> vnode<span class="token punctuation">,</span> args <span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">//如果存在多个相同事件的不同处理器，则递归调用</span>
+            <span class="token comment" spellcheck="true">//如on：{click:[[handeler1,1],[handler,2]]}</span>
+            <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">var</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> handler<span class="token punctuation">.</span>length<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                invokeHandler <span class="token punctuation">(</span> handler<span class="token punctuation">[</span> i <span class="token punctuation">]</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+  <span class="token comment" spellcheck="true">/**
+    *
+    * @param event 真实dom的事件对象
+    * @param vnode
+    */</span>
+  <span class="token keyword">function</span> handleEvent <span class="token punctuation">(</span> event<span class="token punctuation">,</span> vnode <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">var</span> name <span class="token operator">=</span> event<span class="token punctuation">.</span>type<span class="token punctuation">,</span>
+        on <span class="token operator">=</span> vnode<span class="token punctuation">.</span>data<span class="token punctuation">.</span>on<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">// 如果找到对应的vnode事件处理器，则调用</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span> on <span class="token operator">&amp;&amp;</span> on<span class="token punctuation">[</span> name <span class="token punctuation">]</span> <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        invokeHandler <span class="token punctuation">(</span> on<span class="token punctuation">[</span> name <span class="token punctuation">]</span><span class="token punctuation">,</span> vnode<span class="token punctuation">,</span> event <span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+  <span class="token comment" spellcheck="true">//事件监听器生成器，用于处理真实DOM事件</span>
+  <span class="token keyword">function</span> createListener <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token keyword">function</span> handler <span class="token punctuation">(</span> event <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        handleEvent <span class="token punctuation">(</span> event<span class="token punctuation">,</span> handler<span class="token punctuation">.</span>vnode <span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+  <span class="token comment" spellcheck="true">//更新事件监听</span>
+  <span class="token keyword">function</span> updateEventListeners <span class="token punctuation">(</span> oldVnode<span class="token punctuation">,</span> vnode <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">var</span> oldOn <span class="token operator">=</span> oldVnode<span class="token punctuation">.</span>data<span class="token punctuation">.</span>on<span class="token punctuation">,</span>
+        oldListener <span class="token operator">=</span> oldVnode<span class="token punctuation">.</span>listener<span class="token punctuation">,</span>
+        oldElm <span class="token operator">=</span> oldVnode<span class="token punctuation">.</span>elm<span class="token punctuation">,</span>
+        on <span class="token operator">=</span> vnode <span class="token operator">&amp;&amp;</span> vnode<span class="token punctuation">.</span>data<span class="token punctuation">.</span>on<span class="token punctuation">,</span>
+        elm <span class="token operator">=</span> vnode <span class="token operator">&amp;&amp;</span> vnode<span class="token punctuation">.</span>elm<span class="token punctuation">,</span>
+        name<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">// optimization for reused immutable handlers</span>
+    <span class="token comment" spellcheck="true">//如果新旧事件监听器一样，则直接返回</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span> oldOn <span class="token operator">===</span> on <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">// remove existing listeners which no longer used</span>
+    <span class="token comment" spellcheck="true">//如果新节点上没有事件监听，则将旧节点上的事件监听都删除</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span> oldOn <span class="token operator">&amp;&amp;</span> oldListener <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// if element changed or deleted we remove all existing listeners unconditionally</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span> <span class="token operator">!</span>on <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">for</span> <span class="token punctuation">(</span>name <span class="token keyword">in</span> oldOn<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token comment" spellcheck="true">// remove listener if element was changed or existing listeners removed</span>
+                oldElm<span class="token punctuation">.</span>removeEventListener <span class="token punctuation">(</span> name<span class="token punctuation">,</span> oldListener<span class="token punctuation">,</span> <span class="token boolean">false</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">//删除旧节点中新节点不存在的事件监听</span>
+            <span class="token keyword">for</span> <span class="token punctuation">(</span>name <span class="token keyword">in</span> oldOn<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token comment" spellcheck="true">// remove listener if existing listener removed</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span> <span class="token operator">!</span>on<span class="token punctuation">[</span> name <span class="token punctuation">]</span> <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    oldElm<span class="token punctuation">.</span>removeEventListener <span class="token punctuation">(</span> name<span class="token punctuation">,</span> oldListener<span class="token punctuation">,</span> <span class="token boolean">false</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+        <span class="token comment" spellcheck="true">// add new listeners which has not already attached</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span> on <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// reuse existing listener or create new</span>
+        <span class="token comment" spellcheck="true">//如果oldvnode上已经有listener，则vnode直接复用，否则则新建事件处理器</span>
+        <span class="token keyword">var</span> listener <span class="token operator">=</span> vnode<span class="token punctuation">.</span>listener <span class="token operator">=</span> oldVnode<span class="token punctuation">.</span>listener <span class="token operator">||</span> createListener <span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">// update vnode for listener</span>
+        <span class="token comment" spellcheck="true">//在事件处理器上绑定vnode</span>
+        listener<span class="token punctuation">.</span>vnode <span class="token operator">=</span> vnode<span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">// if element changed or added we add all needed listeners unconditionally‘</span>
+        <span class="token comment" spellcheck="true">//如果oldvnode上没有事件处理器</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span> <span class="token operator">!</span>oldOn <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">for</span> <span class="token punctuation">(</span>name <span class="token keyword">in</span> on<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token comment" spellcheck="true">// add listener if element was changed or new listeners added</span>
+                <span class="token comment" spellcheck="true">//直接将vnode上的事件处理器添加到elm上</span>
+                elm<span class="token punctuation">.</span>addEventListener <span class="token punctuation">(</span> name<span class="token punctuation">,</span> listener<span class="token punctuation">,</span> <span class="token boolean">false</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            <span class="token keyword">for</span> <span class="token punctuation">(</span>name <span class="token keyword">in</span> on<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token comment" spellcheck="true">// add listener if new listener added</span>
+                <span class="token comment" spellcheck="true">//否则添加oldvnode上没有的事件处理器</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span> <span class="token operator">!</span>oldOn<span class="token punctuation">[</span> name <span class="token punctuation">]</span> <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    elm<span class="token punctuation">.</span>addEventListener <span class="token punctuation">(</span> name<span class="token punctuation">,</span> listener<span class="token punctuation">,</span> <span class="token boolean">false</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+
+  module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">{</span>
+    create<span class="token punctuation">:</span> updateEventListeners<span class="token punctuation">,</span>
+    update<span class="token punctuation">:</span> updateEventListeners<span class="token punctuation">,</span>
+    destroy<span class="token punctuation">:</span> updateEventListeners
+  <span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre>
+<h3 id="props"><a href="#props" class="headerlink" title="props"></a>props</h3><p>主要功能：</p>
 <ul>
 <li>从elm上删除vnode中不存在的属性</li>
-<li><p>更新elm上的属性</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">updateProps</span>(<span class="params">oldVnode, vnode</span>) </span>&#123;</div><div class="line">  <span class="keyword">var</span> key, cur, old, elm = vnode.elm,</div><div class="line">      oldProps = oldVnode.data.props, props = vnode.data.props;</div><div class="line"> <span class="comment">//如果新旧节点都不存在属性，则直接返回</span></div><div class="line">  <span class="keyword">if</span> (!oldProps &amp;&amp; !props) <span class="keyword">return</span>;</div><div class="line">  oldProps = oldProps || &#123;&#125;;</div><div class="line">  props = props || &#123;&#125;;</div><div class="line">  <span class="comment">//删除旧节点中新节点没有的属性</span></div><div class="line">  <span class="keyword">for</span> (key <span class="keyword">in</span> oldProps) &#123;</div><div class="line">    <span class="keyword">if</span> (!props[key]) &#123;</div><div class="line">      <span class="keyword">delete</span> elm[key];</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  <span class="comment">//更新属性</span></div><div class="line">  <span class="keyword">for</span> (key <span class="keyword">in</span> props) &#123;</div><div class="line">    cur = props[key];</div><div class="line">    old = oldProps[key];</div><div class="line">    <span class="comment">//如果新旧节点属性不同，且对比的属性不是value或者elm上对应属性和新属性也不同，那么就需要更新</span></div><div class="line">    <span class="keyword">if</span> (old !== cur &amp;&amp; (key !== <span class="string">'value'</span> || elm[key] !== cur)) &#123;</div><div class="line">      elm[key] = cur;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">module</span>.exports = &#123;<span class="attr">create</span>: updateProps, <span class="attr">update</span>: updateProps&#125;;</div></pre></td></tr></table></figure>
-</li>
+<li>更新elm上的属性</li>
 </ul>
+<pre class=" language-javascript"><code class="language-javascript">  <span class="token keyword">function</span> <span class="token function">updateProps</span><span class="token punctuation">(</span>oldVnode<span class="token punctuation">,</span> vnode<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">var</span> key<span class="token punctuation">,</span> cur<span class="token punctuation">,</span> old<span class="token punctuation">,</span> elm <span class="token operator">=</span> vnode<span class="token punctuation">.</span>elm<span class="token punctuation">,</span>
+        oldProps <span class="token operator">=</span> oldVnode<span class="token punctuation">.</span>data<span class="token punctuation">.</span>props<span class="token punctuation">,</span> props <span class="token operator">=</span> vnode<span class="token punctuation">.</span>data<span class="token punctuation">.</span>props<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//如果新旧节点都不存在属性，则直接返回</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>oldProps <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>props<span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span>
+    oldProps <span class="token operator">=</span> oldProps <span class="token operator">||</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+    props <span class="token operator">=</span> props <span class="token operator">||</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//删除旧节点中新节点没有的属性</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>key <span class="token keyword">in</span> oldProps<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>props<span class="token punctuation">[</span>key<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">delete</span> elm<span class="token punctuation">[</span>key<span class="token punctuation">]</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">//更新属性</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>key <span class="token keyword">in</span> props<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      cur <span class="token operator">=</span> props<span class="token punctuation">[</span>key<span class="token punctuation">]</span><span class="token punctuation">;</span>
+      old <span class="token operator">=</span> oldProps<span class="token punctuation">[</span>key<span class="token punctuation">]</span><span class="token punctuation">;</span>
+      <span class="token comment" spellcheck="true">//如果新旧节点属性不同，且对比的属性不是value或者elm上对应属性和新属性也不同，那么就需要更新</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>old <span class="token operator">!==</span> cur <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span>key <span class="token operator">!==</span> <span class="token string">'value'</span> <span class="token operator">||</span> elm<span class="token punctuation">[</span>key<span class="token punctuation">]</span> <span class="token operator">!==</span> cur<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        elm<span class="token punctuation">[</span>key<span class="token punctuation">]</span> <span class="token operator">=</span> cur<span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+  module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">{</span>create<span class="token punctuation">:</span> updateProps<span class="token punctuation">,</span> update<span class="token punctuation">:</span> updateProps<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre>
 <h3 id="style"><a href="#style" class="headerlink" title="style"></a>style</h3><p>主要功能如下：</p>
 <ul>
 <li>将elm上存在于oldvnode中但不存在于vnode中不存在的style置空</li>
 <li>如果vnode.style中的delayed与oldvnode的不同，则更新delayed的属性值，并在下一帧将elm的style设置为该值，从而实现动画过渡效果</li>
 <li>非delayed和remove的style直接更新</li>
 <li>vnode被destroy时，直接将对应style更新为vnode.data.style.destory的值</li>
-<li><p>vnode被reomve时，如果style.remove不存在，直接调用全局remove钩子进入下一个remove过程<br>如果style.remove存在，那么我们就需要设置remove动画过渡效果，等到过渡效果结束之后，才调用<br>下一个remove过程</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//如果存在requestAnimationFrame，则直接使用，以优化性能，否则用setTimeout</span></div><div class="line"><span class="keyword">var</span> raf = (<span class="keyword">typeof</span> <span class="built_in">window</span> !== <span class="string">'undefined'</span> &amp;&amp; <span class="built_in">window</span>.requestAnimationFrame) || setTimeout;</div><div class="line"><span class="keyword">var</span> nextFrame = <span class="function"><span class="keyword">function</span>(<span class="params">fn</span>) </span>&#123; raf(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123; raf(fn); &#125;); &#125;;</div><div class="line"></div><div class="line"><span class="comment">//通过nextFrame来实现动画效果</span></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">setNextFrame</span>(<span class="params">obj, prop, val</span>) </span>&#123;</div><div class="line">  nextFrame(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123; obj[prop] = val; &#125;);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">updateStyle</span>(<span class="params">oldVnode, vnode</span>) </span>&#123;</div><div class="line">  <span class="keyword">var</span> cur, name, elm = vnode.elm,</div><div class="line">      oldStyle = oldVnode.data.style,</div><div class="line">      style = vnode.data.style;</div><div class="line">  <span class="comment">//如果oldvnode和vnode都没有style，直接返回</span></div><div class="line">  <span class="keyword">if</span> (!oldStyle &amp;&amp; !style) <span class="keyword">return</span>;</div><div class="line">  oldStyle = oldStyle || &#123;&#125;;</div><div class="line">  style = style || &#123;&#125;;</div><div class="line">  <span class="keyword">var</span> oldHasDel = <span class="string">'delayed'</span> <span class="keyword">in</span> oldStyle;</div><div class="line">  <span class="comment">//遍历oldvnode的style</span></div><div class="line">  <span class="keyword">for</span> (name <span class="keyword">in</span> oldStyle) &#123;</div><div class="line">    <span class="comment">//如果vnode中无该style，则置空</span></div><div class="line">    <span class="keyword">if</span> (!style[name]) &#123;</div><div class="line">      elm.style[name] = <span class="string">''</span>;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  <span class="comment">//如果vnode的style中有delayed且与oldvnode中的不同，则在下一帧设置delayed的参数</span></div><div class="line">  <span class="keyword">for</span> (name <span class="keyword">in</span> style) &#123;</div><div class="line">    cur = style[name];</div><div class="line">    <span class="keyword">if</span> (name === <span class="string">'delayed'</span>) &#123;</div><div class="line">      <span class="keyword">for</span> (name <span class="keyword">in</span> style.delayed) &#123;</div><div class="line">        cur = style.delayed[name];</div><div class="line">        <span class="keyword">if</span> (!oldHasDel || cur !== oldStyle.delayed[name]) &#123;</div><div class="line">          setNextFrame(elm.style, name, cur);</div><div class="line">        &#125;</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="comment">//如果不是delayed和remove的style，且不同于oldvnode的值，则直接设置新值</span></div><div class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (name !== <span class="string">'remove'</span> &amp;&amp; cur !== oldStyle[name]) &#123;</div><div class="line">      elm.style[name] = cur;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">//设置节点被destory时的style</span></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">applyDestroyStyle</span>(<span class="params">vnode</span>) </span>&#123;</div><div class="line">  <span class="keyword">var</span> style, name, elm = vnode.elm, s = vnode.data.style;</div><div class="line">  <span class="keyword">if</span> (!s || !(style = s.destroy)) <span class="keyword">return</span>;</div><div class="line">  <span class="keyword">for</span> (name <span class="keyword">in</span> style) &#123;</div><div class="line">    elm.style[name] = style[name];</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line"><span class="comment">//删除效果，当我们删除一个元素时，先回调用删除过度效果，过渡完才会将节点remove</span></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">applyRemoveStyle</span>(<span class="params">vnode, rm</span>) </span>&#123;</div><div class="line">  <span class="keyword">var</span> s = vnode.data.style;</div><div class="line">  <span class="comment">//如果没有style或没有style.remove</span></div><div class="line">  <span class="keyword">if</span> (!s || !s.remove) &#123;</div><div class="line">    <span class="comment">//直接调用rm，即实际上是调用全局的remove钩子</span></div><div class="line">    rm();</div><div class="line">    <span class="keyword">return</span>;</div><div class="line">  &#125;</div><div class="line">  <span class="keyword">var</span> name, elm = vnode.elm, idx, i = <span class="number">0</span>, maxDur = <span class="number">0</span>,</div><div class="line">      compStyle, style = s.remove, amount = <span class="number">0</span>, applied = [];</div><div class="line">  <span class="comment">//设置并记录remove动作后删除节点前的样式</span></div><div class="line">  <span class="keyword">for</span> (name <span class="keyword">in</span> style) &#123;</div><div class="line">    applied.push(name);</div><div class="line">    elm.style[name] = style[name];</div><div class="line">  &#125;</div><div class="line">  compStyle = getComputedStyle(elm);</div><div class="line">  <span class="comment">//拿到所有需要过渡的属性</span></div><div class="line">  <span class="keyword">var</span> props = compStyle[<span class="string">'transition-property'</span>].split(<span class="string">', '</span>);</div><div class="line">  <span class="comment">//对过渡属性计数，这里applied.length &gt;=amount，因为有些属性是不需要过渡的</span></div><div class="line">  <span class="keyword">for</span> (; i &lt; props.length; ++i) &#123;</div><div class="line">    <span class="keyword">if</span>(applied.indexOf(props[i]) !== <span class="number">-1</span>) amount++;</div><div class="line">  &#125;</div><div class="line">  <span class="comment">//当过渡效果的完成后，才remove节点，调用下一个remove过程</span></div><div class="line">  elm.addEventListener(<span class="string">'transitionend'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">ev</span>) </span>&#123;</div><div class="line">    <span class="keyword">if</span> (ev.target === elm) --amount;</div><div class="line">    <span class="keyword">if</span> (amount === <span class="number">0</span>) rm();</div><div class="line">  &#125;);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">module</span>.exports = &#123;<span class="attr">create</span>: updateStyle, <span class="attr">update</span>: updateStyle, <span class="attr">destroy</span>: applyDestroyStyle, <span class="attr">remove</span>: applyRemoveStyle&#125;;</div></pre></td></tr></table></figure>
-</li>
+<li>vnode被reomve时，如果style.remove不存在，直接调用全局remove钩子进入下一个remove过程<br>如果style.remove存在，那么我们就需要设置remove动画过渡效果，等到过渡效果结束之后，才调用<br>下一个remove过程</li>
 </ul>
+<pre class=" language-javascript"><code class="language-javascript">  <span class="token comment" spellcheck="true">//如果存在requestAnimationFrame，则直接使用，以优化性能，否则用setTimeout</span>
+  <span class="token keyword">var</span> raf <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">typeof</span> window <span class="token operator">!==</span> <span class="token string">'undefined'</span> <span class="token operator">&amp;&amp;</span> window<span class="token punctuation">.</span>requestAnimationFrame<span class="token punctuation">)</span> <span class="token operator">||</span> setTimeout<span class="token punctuation">;</span>
+  <span class="token keyword">var</span> nextFrame <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span>fn<span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token function">raf</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token function">raf</span><span class="token punctuation">(</span>fn<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token punctuation">}</span><span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">//通过nextFrame来实现动画效果</span>
+  <span class="token keyword">function</span> <span class="token function">setNextFrame</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> prop<span class="token punctuation">,</span> val<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">nextFrame</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> obj<span class="token punctuation">[</span>prop<span class="token punctuation">]</span> <span class="token operator">=</span> val<span class="token punctuation">;</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">function</span> <span class="token function">updateStyle</span><span class="token punctuation">(</span>oldVnode<span class="token punctuation">,</span> vnode<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">var</span> cur<span class="token punctuation">,</span> name<span class="token punctuation">,</span> elm <span class="token operator">=</span> vnode<span class="token punctuation">.</span>elm<span class="token punctuation">,</span>
+        oldStyle <span class="token operator">=</span> oldVnode<span class="token punctuation">.</span>data<span class="token punctuation">.</span>style<span class="token punctuation">,</span>
+        style <span class="token operator">=</span> vnode<span class="token punctuation">.</span>data<span class="token punctuation">.</span>style<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//如果oldvnode和vnode都没有style，直接返回</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>oldStyle <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>style<span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span>
+    oldStyle <span class="token operator">=</span> oldStyle <span class="token operator">||</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+    style <span class="token operator">=</span> style <span class="token operator">||</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+    <span class="token keyword">var</span> oldHasDel <span class="token operator">=</span> <span class="token string">'delayed'</span> <span class="token keyword">in</span> oldStyle<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//遍历oldvnode的style</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>name <span class="token keyword">in</span> oldStyle<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token comment" spellcheck="true">//如果vnode中无该style，则置空</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>style<span class="token punctuation">[</span>name<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        elm<span class="token punctuation">.</span>style<span class="token punctuation">[</span>name<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">''</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">//如果vnode的style中有delayed且与oldvnode中的不同，则在下一帧设置delayed的参数</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>name <span class="token keyword">in</span> style<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      cur <span class="token operator">=</span> style<span class="token punctuation">[</span>name<span class="token punctuation">]</span><span class="token punctuation">;</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>name <span class="token operator">===</span> <span class="token string">'delayed'</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span>name <span class="token keyword">in</span> style<span class="token punctuation">.</span>delayed<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+          cur <span class="token operator">=</span> style<span class="token punctuation">.</span>delayed<span class="token punctuation">[</span>name<span class="token punctuation">]</span><span class="token punctuation">;</span>
+          <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>oldHasDel <span class="token operator">||</span> cur <span class="token operator">!==</span> oldStyle<span class="token punctuation">.</span>delayed<span class="token punctuation">[</span>name<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token function">setNextFrame</span><span class="token punctuation">(</span>elm<span class="token punctuation">.</span>style<span class="token punctuation">,</span> name<span class="token punctuation">,</span> cur<span class="token punctuation">)</span><span class="token punctuation">;</span>
+          <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span>
+      <span class="token comment" spellcheck="true">//如果不是delayed和remove的style，且不同于oldvnode的值，则直接设置新值</span>
+      <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>name <span class="token operator">!==</span> <span class="token string">'remove'</span> <span class="token operator">&amp;&amp;</span> cur <span class="token operator">!==</span> oldStyle<span class="token punctuation">[</span>name<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        elm<span class="token punctuation">.</span>style<span class="token punctuation">[</span>name<span class="token punctuation">]</span> <span class="token operator">=</span> cur<span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+  <span class="token comment" spellcheck="true">//设置节点被destory时的style</span>
+  <span class="token keyword">function</span> <span class="token function">applyDestroyStyle</span><span class="token punctuation">(</span>vnode<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">var</span> style<span class="token punctuation">,</span> name<span class="token punctuation">,</span> elm <span class="token operator">=</span> vnode<span class="token punctuation">.</span>elm<span class="token punctuation">,</span> s <span class="token operator">=</span> vnode<span class="token punctuation">.</span>data<span class="token punctuation">.</span>style<span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>s <span class="token operator">||</span> <span class="token operator">!</span><span class="token punctuation">(</span>style <span class="token operator">=</span> s<span class="token punctuation">.</span>destroy<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>name <span class="token keyword">in</span> style<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      elm<span class="token punctuation">.</span>style<span class="token punctuation">[</span>name<span class="token punctuation">]</span> <span class="token operator">=</span> style<span class="token punctuation">[</span>name<span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+  <span class="token comment" spellcheck="true">//删除效果，当我们删除一个元素时，先回调用删除过度效果，过渡完才会将节点remove</span>
+  <span class="token keyword">function</span> <span class="token function">applyRemoveStyle</span><span class="token punctuation">(</span>vnode<span class="token punctuation">,</span> rm<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">var</span> s <span class="token operator">=</span> vnode<span class="token punctuation">.</span>data<span class="token punctuation">.</span>style<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//如果没有style或没有style.remove</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>s <span class="token operator">||</span> <span class="token operator">!</span>s<span class="token punctuation">.</span>remove<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token comment" spellcheck="true">//直接调用rm，即实际上是调用全局的remove钩子</span>
+      <span class="token function">rm</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">var</span> name<span class="token punctuation">,</span> elm <span class="token operator">=</span> vnode<span class="token punctuation">.</span>elm<span class="token punctuation">,</span> idx<span class="token punctuation">,</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> maxDur <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span>
+        compStyle<span class="token punctuation">,</span> style <span class="token operator">=</span> s<span class="token punctuation">.</span>remove<span class="token punctuation">,</span> amount <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> applied <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//设置并记录remove动作后删除节点前的样式</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>name <span class="token keyword">in</span> style<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      applied<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      elm<span class="token punctuation">.</span>style<span class="token punctuation">[</span>name<span class="token punctuation">]</span> <span class="token operator">=</span> style<span class="token punctuation">[</span>name<span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    compStyle <span class="token operator">=</span> <span class="token function">getComputedStyle</span><span class="token punctuation">(</span>elm<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//拿到所有需要过渡的属性</span>
+    <span class="token keyword">var</span> props <span class="token operator">=</span> compStyle<span class="token punctuation">[</span><span class="token string">'transition-property'</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">split</span><span class="token punctuation">(</span><span class="token string">', '</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//对过渡属性计数，这里applied.length >=amount，因为有些属性是不需要过渡的</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> props<span class="token punctuation">.</span>length<span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">if</span><span class="token punctuation">(</span>applied<span class="token punctuation">.</span><span class="token function">indexOf</span><span class="token punctuation">(</span>props<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!==</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span> amount<span class="token operator">++</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">//当过渡效果的完成后，才remove节点，调用下一个remove过程</span>
+    elm<span class="token punctuation">.</span><span class="token function">addEventListener</span><span class="token punctuation">(</span><span class="token string">'transitionend'</span><span class="token punctuation">,</span> <span class="token keyword">function</span><span class="token punctuation">(</span>ev<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>ev<span class="token punctuation">.</span>target <span class="token operator">===</span> elm<span class="token punctuation">)</span> <span class="token operator">--</span>amount<span class="token punctuation">;</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>amount <span class="token operator">===</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token function">rm</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">{</span>create<span class="token punctuation">:</span> updateStyle<span class="token punctuation">,</span> update<span class="token punctuation">:</span> updateStyle<span class="token punctuation">,</span> destroy<span class="token punctuation">:</span> applyDestroyStyle<span class="token punctuation">,</span> remove<span class="token punctuation">:</span> applyRemoveStyle<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre>
 <h2 id="第五站-is"><a href="#第五站-is" class="headerlink" title="第五站 is"></a>第五站 is</h2><p>啃完modules这些大部头，总算有个比较好吃的甜品了，他主要功能就是判断是否为array类型或者原始类型</p>
-<pre><code><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//is工具库，用于判断是否为array或者原始类型</span></div><div class="line"><span class="built_in">module</span>.exports = &#123;</div><div class="line">  <span class="attr">array</span>: <span class="built_in">Array</span>.isArray,</div><div class="line">  <span class="attr">primitive</span>: <span class="function"><span class="keyword">function</span>(<span class="params">s</span>) </span>&#123; <span class="keyword">return</span> <span class="keyword">typeof</span> s === <span class="string">'string'</span> || <span class="keyword">typeof</span> s === <span class="string">'number'</span>; &#125;,</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
-</code></pre><h2 id="中途休息"><a href="#中途休息" class="headerlink" title="中途休息"></a>中途休息</h2><p>看了这么多源码，估计也累了吧，毕竟一下完全理解可能有点难，不妨先休息一下，消化一下，下一章将会见到最大的boss——snabbdom本身！</p>
+<pre class=" language-javascript"><code class="language-javascript">  <span class="token comment" spellcheck="true">//is工具库，用于判断是否为array或者原始类型</span>
+  module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">{</span>
+    array<span class="token punctuation">:</span> Array<span class="token punctuation">.</span>isArray<span class="token punctuation">,</span>
+    primitive<span class="token punctuation">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token keyword">return</span> <span class="token keyword">typeof</span> s <span class="token operator">===</span> <span class="token string">'string'</span> <span class="token operator">||</span> <span class="token keyword">typeof</span> s <span class="token operator">===</span> <span class="token string">'number'</span><span class="token punctuation">;</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre>
+<h2 id="中途休息"><a href="#中途休息" class="headerlink" title="中途休息"></a>中途休息</h2><p>看了这么多源码，估计也累了吧，毕竟一下完全理解可能有点难，不妨先休息一下，消化一下，下一章将会见到最大的boss——snabbdom本身！</p>
 
-      
-    </div>
-
-    <div>
-      
-        
-
-      
-    </div>
-
-    <div>
-      
-        
-
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-        <div class="post-tags">
-          
-            <a href="/tags/源码/" rel="tag"># 源码</a>
-          
-            <a href="/tags/vue/" rel="tag"># vue</a>
-          
-            <a href="/tags/snabbdom/" rel="tag"># snabbdom</a>
-          
-        </div>
-      
-
-      
-        
-      
-
-      
-        <div class="post-nav">
-          <div class="post-nav-next post-nav-item">
-            
-              <a href="/2017/03/16/JavaScript设计模式——发布订阅/" rel="next" title="JavaScript设计模式——发布订阅">
-                <i class="fa fa-chevron-left"></i> JavaScript设计模式——发布订阅
-              </a>
-            
-          </div>
-
-          <span class="post-nav-divider"></span>
-
-          <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/03/21/vue2源码学习开胃菜——snabbdom源码学习（二）/" rel="prev" title="vue2源码学习开胃菜——snabbdom源码学习（二）">
-                vue2源码学习开胃菜——snabbdom源码学习（二） <i class="fa fa-chevron-right"></i>
-              </a>
-            
-          </div>
-        </div>
-      
-
-      
-      
-    </footer>
-  </article>
-
-
-
-    <div class="post-spread">
-      
-    </div>
-  </div>
-
-          
-          </div>
-          
-
-
-          
-  <div class="comments" id="comments">
     
-  </div>
 
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+        <a href="/2017/03/21/vue2源码学习开胃菜——snabbdom源码学习（二）/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            新篇
+        </a>
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2017/03/16/JavaScript设计模式——发布订阅/" id="post_nav-older" class="next-content">
+            舊篇
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
 
         </div>
-        
-          
-  
-  <div class="sidebar-toggle">
-    <div class="sidebar-toggle-line-wrap">
-      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
-      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
-      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
     </div>
-  </div>
 
-  <aside id="sidebar" class="sidebar">
-    <div class="sidebar-inner">
 
-      
 
-      
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
-            文章目录
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview">
-            站点概览
-          </li>
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/avatar.png" alt="Stein Lee's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        youremail@email.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="#" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
         </ul>
-      
+    </li>
 
-      <section class="site-overview sidebar-panel">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-          <img class="site-author-image" itemprop="image"
-               src="/images/avatar.gif"
-               alt="Stein Lee" />
-          <p class="site-author-name" itemprop="name">Stein Lee</p>
-           
-              <p class="site-description motion-element" itemprop="description"></p>
-          
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                首頁
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    過往
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2017/08/">八月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/03/">三月 2017<span class="sidebar_archives-count">9</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/02/">二月 2017<span class="sidebar_archives-count">3</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+
+    <!-- Pages  -->
+    
+
+    <!-- Article Number  -->
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+    <div class="sidebar-divider"></div>
+
+
+<!-- Theme Material -->
+
+    <a href="https://github.com/viosey/hexo-theme-material"  class="sidebar-footer-text-a" target="_blank">
+        <div class="sidebar-text mdl-button mdl-js-button mdl-js-ripple-effect sidebar-footer-text-div" data-upgraded=",MaterialButton,MaterialRipple">
+            主題 - Material
+            <span class="sidebar-badge badge-circle">i</span>
         </div>
-        <nav class="site-state motion-element">
-        
-          
-            <div class="site-state-item site-state-posts">
-              <a href="/archives">
-                <span class="site-state-item-count">12</span>
-                <span class="site-state-item-name">日志</span>
-              </a>
-            </div>
-          
-
-          
-
-          
-            <div class="site-state-item site-state-tags">
-              <a href="/tags">
-                <span class="site-state-item-count">10</span>
-                <span class="site-state-item-name">标签</span>
-              </a>
-            </div>
-          
-
-        </nav>
-
-        
-
-        <div class="links-of-author motion-element">
-          
-        </div>
-
-        
-        
-
-        
-        
-
-        
+    </a>
 
 
-      </section>
+<!-- Help & Support -->
+<!--
 
-      
-      <!--noindex-->
-        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
+-->
 
-            
-              
-            
+<!-- Feedback -->
+<!--
 
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#什么是virtual-dom"><span class="nav-number">2.</span> <span class="nav-text">什么是virtual-dom</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#为什么是virtual-dom"><span class="nav-number">3.</span> <span class="nav-text">为什么是virtual-dom</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#snabbdom目录结构"><span class="nav-number">4.</span> <span class="nav-text">snabbdom目录结构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#snabbdom源码之旅"><span class="nav-number">5.</span> <span class="nav-text">snabbdom源码之旅</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#第一站-vnode"><span class="nav-number">5.1.</span> <span class="nav-text">第一站 vnode</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#第二站-h"><span class="nav-number">5.2.</span> <span class="nav-text">第二站 h</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#第三站-htmldomapi"><span class="nav-number">5.3.</span> <span class="nav-text">第三站 htmldomapi</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#第四站-modules"><span class="nav-number">5.4.</span> <span class="nav-text">第四站 modules</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#attributes"><span class="nav-number">5.4.1.</span> <span class="nav-text">attributes</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#class"><span class="nav-number">5.4.2.</span> <span class="nav-text">class</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dataset"><span class="nav-number">5.4.3.</span> <span class="nav-text">dataset</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#eventlistener"><span class="nav-number">5.4.4.</span> <span class="nav-text">eventlistener</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#props"><span class="nav-number">5.4.5.</span> <span class="nav-text">props</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#style"><span class="nav-number">5.4.6.</span> <span class="nav-text">style</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#第五站-is"><span class="nav-number">5.5.</span> <span class="nav-text">第五站 is</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#中途休息"><span class="nav-number">5.6.</span> <span class="nav-text">中途休息</span></a></li></ol></li></ol></div>
-            
+-->
 
-          </div>
-        </section>
-      <!--/noindex-->
-      
+<!-- About Theme -->
+<!--
 
-      
+-->
 
     </div>
-  </aside>
 
+    <!-- Sidebar Image -->
+    
 
-        
-      </div>
-    </main>
+</aside>
 
-    <footer id="footer" class="footer">
-      <div class="footer-inner">
-        <div class="copyright" >
-  
-  &copy; 
-  <span itemprop="copyrightYear">2017</span>
-  <span class="with-love">
-    <i class="fa fa-heart"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">Stein Lee</span>
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div id="back-to-top" class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+        <a href="https://twitter.com/twitter" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-twitter">
+                <span class="visuallyhidden">Twitter</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Facebook -->
+    
+        <a href="https://www.facebook.com/facebook" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-facebook">
+                <span class="visuallyhidden">Facebook</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Google + -->
+    
+        <a href="https://www.google.com/" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-gplus">
+                <span class="visuallyhidden">Google Plus</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Weibo -->
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/steinns" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-github">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
 </div>
 
 
-<div class="powered-by">
-  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
-</div>
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©<script type="text/javascript">var fd = new Date();document.write("&nbsp;" + fd.getFullYear() + "&nbsp;");</script>Stein's blog
+        </div>
 
-<div class="theme-info">
-  主题 -
-  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
-    NexT.Mist
-  </a>
-</div>
+        <!-- Paradox Footer Right Section -->
 
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
 
-        
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
 
-        
-      </div>
-    </footer>
-
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
     
-      <div class="back-to-top">
-        <i class="fa fa-arrow-up"></i>
-        
-      </div>
-    
-    
-  </div>
+</footer>
 
-  
 
-<script type="text/javascript">
-  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
-    window.Promise = null;
-  }
+                    <!-- Import File -->
+
+
+    <script>lsloader.load("js/lazyload.min.js","/js/lazyload.min.js?1BcfzuNXqV+ntF6gq+5X3Q==")</script>
+    <script>lsloader.load("js/js.min.js","/js/js.min.js?oAl/+lvaqTFV31JXTmbrNA==")</script>
+
+
+
+    <script>lsloader.load("js/nprogress.js","/js/nprogress.js?pl3Qhb9lvqR1FlyLUna1Yw==")</script>
+
+
+<script type="text/ls-javascript" id="NProgress-script">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
 </script>
 
 
@@ -737,99 +1368,62 @@
 
 
 
-  
 
 
 
 
-  
-  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+<!-- UC Browser Compatible -->
+<script>
+	var agent = navigator.userAgent.toLowerCase();
+	if(agent.indexOf('ucbrowser')>0) {
+		document.write('<link rel="stylesheet" href="/css/uc.css">');
+	   alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+	}
+</script>
 
-  
-  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+<!-- Window Load-->
+<script type="text/ls-javascript" id="window-load">
+    $(window).on('load', function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+</script>
 
-  
-  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+<!-- MathJax Load-->
 
-  
-  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+<script type="text/ls-javascript" id="lazy-load">
+    // Offer LazyLoad
+    queue.offer(function(){
+        $('.lazy').lazyload({
+            effect : 'show'
+        });
+    });
 
-  
-  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+    // Start Queue
+    $(document).ready(function(){
+        setInterval(function(){
+            queue.execNext();
+        },200);
+    });
+</script>
 
-  
-  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
-
-
-  
-
-
-  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
-
-  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
-
-
-
-  
-  
-
-  
-  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
-<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
-
-
-
-  
+<!-- Bing Background -->
 
 
-  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+<script>
+    (function(){
+        var scriptList = document.querySelectorAll('script[type="text/ls-javascript"]')
 
+        for (var i = 0; i < scriptList.length; ++i) {
+            var item = scriptList[i];
+            lsloader.runInlineScript(item.id,item.id);
+        }
+    })()
+console.log('\n %c © Material Theme | Version: 1.4.0 | https://github.com/viosey/hexo-theme-material %c \n', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-left-radius:5px;border-bottom-left-radius:5px;', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-right-radius:5px;border-bottom-right-radius:5px;');
+</script>
 
-
-  
-
-
-
-  
-
-
-
-
-	
-
-
-
-
-
-  
-
-
-
-
-
-  
-
-
-
-
-
-  
-
-
-
-  
-  
-
-  
-
-  
-
-  
-
-  
-
-
-  
-
-</body>
+                </main>
+            </div>
+        </body>
+    
 </html>
