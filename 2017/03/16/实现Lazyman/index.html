@@ -72,7 +72,7 @@
 
     
         <meta property="article:published_time" content="3月 16, 2017" />
-        <meta property="article:modified_time" content="3月 20, 2017" />
+        <meta property="article:modified_time" content="8月 19, 2017" />
     
 
     <!-- The Twitter Card protocol -->
@@ -113,7 +113,7 @@
     "headline": "实现Lazyman",
     "url": "http://yoursite.com/2017/03/16/实现Lazyman/index.html",
     "datePublished": "3月 16, 2017",
-    "dateModified": "3月 20, 2017",
+    "dateModified": "8月 19, 2017",
     "description": "",
     "mainEntityOfPage": {
         "@type": "WebPage",
@@ -488,94 +488,83 @@
                 <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
     
         <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>之前在掘金上到一篇文章关于微信面试的文章，其中提到了手动实现Lazyman的问题。刚开始<br>看到Lazyman我是一脸懵逼的，这是什么鬼，后来查了查了一下，才发现，其实就是手动实现<br>以下功能：</p>
-<pre><code>```javascript
-实现一个LazyMan，可以按照以下方式调用:
+<pre><code>实现一个LazyMan，可以按照以下方式调用:
 LazyMan(“Hank”)输出:
-Hi! This is Hank!
- 
+Hi! This is Hank!  
 LazyMan(“Hank”).sleep(10).eat(“dinner”)输出
 Hi! This is Hank!
 //等待10秒..
 Wake up after 10
 Eat dinner~
- 
+     
 LazyMan(“Hank”).eat(“dinner”).eat(“supper”)输出
 Hi This is Hank!
 Eat dinner~
 Eat supper~
- 
+     
 LazyMan(“Hank”).sleepFirst(5).eat(“supper”)输出
 //等待5秒
 Wake up after 5
 Hi This is Hank!
 Eat supper
- 
+     
 以此类推。
-```
 </code></pre><p>看起来好像挺有趣的，我们来分析以下</p>
 <h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>首先我们看到例子有几个特点，一个是我们调用Lazyman的时候不需要用到new关键字，这意味着我们需要使用工厂函数；另一个是要我们实现链式调用。<br>我们看到<code>LazyMan(“Hank”).eat(“dinner”).eat(“supper”)</code>这样的形式，无疑是链式调用了；还有一个难点就是 <code>LazyMan(“Hank”).sleepFirst(5).eat(“supper”)</code><br>当存在<code>sleepFirst</code>时，我们还要先等待一段时间，然后再开始报名字，这就说明<code>sleepFirst</code>优先级更高，不管何时注册，都要第一个执行，仔细想想<br>有什么可以实现这个呢？明显我们需要一个任务队列，而且<code>sleepFirst</code>放在最前面，然后等所有任务都安排好了，才开始执行任务队列<br>恩？那说明执行任务不能紧跟在插入任务全程的后面，那我们见他们分进两个事件队列就好了，这就需要借助<code>setTimeout</code>函数了;<br>除此之外，一个任务完成了，我们怎么通知任务队列去取下一个任务呢？这就需要一个尾调用。</p>
 <h1 id="编码"><a href="#编码" class="headerlink" title="编码"></a>编码</h1><p>经过上面的分析，我们可以开始编码了：<br>首先，我们先写工厂函数</p>
-<pre><code>```javascript
-function Lazyman ( name ) {
-    return new _Lazyman ( name );
-}
-```
-</code></pre><p>接着我们开始实现Lazyman：</p>
-<pre><code>```javascript
-constructor ( name ) {
-        this.tasks = [];//设置任务队列
-        let task = (name =&gt; () =&gt; {
-            console.log ( `Hi! This is ${name} !` );
-            this.next ();
-        }) ( name );
-        this.tasks.push ( task );
-        //通过settimeout的方法，将执行函数放入下一个事件队列中，从而达到先注册事件，后执行的目的
+<pre class=" language-javascript"><code class="language-javascript"><span class="token keyword">function</span> Lazyman <span class="token punctuation">(</span> name <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">_Lazyman</span> <span class="token punctuation">(</span> name <span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>接着我们开始实现Lazyman：</p>
+<pre class=" language-javascript"><code class="language-javascript">constructor <span class="token punctuation">(</span> name <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>tasks <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//设置任务队列</span>
+    <span class="token keyword">let</span> task <span class="token operator">=</span> <span class="token punctuation">(</span>name <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
+    console<span class="token punctuation">.</span>log <span class="token punctuation">(</span> <span class="token template-string"><span class="token string">`Hi! This is </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>name<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string"> !`</span></span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>next <span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span> <span class="token punctuation">(</span> name <span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>tasks<span class="token punctuation">.</span>push <span class="token punctuation">(</span> task <span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//通过settimeout的方法，将执行函数放入下一个事件队列中，从而达到先注册事件，后执行的目的</span>
+    setTimeout <span class="token punctuation">(</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span>next <span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token number">0</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token comment" spellcheck="true">//尾调用函数，一个任务执行完然后再调用下一个任务</span>
+next <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">let</span> task <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>tasks<span class="token punctuation">.</span>shift <span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  task <span class="token operator">&amp;&amp;</span> task <span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+eat <span class="token punctuation">(</span> food <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">let</span> task <span class="token operator">=</span> <span class="token punctuation">(</span>food <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
+        console<span class="token punctuation">.</span>log <span class="token punctuation">(</span> <span class="token template-string"><span class="token string">`Eat </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>food<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">`</span></span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>next <span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span> <span class="token punctuation">(</span> food <span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>tasks<span class="token punctuation">.</span>push <span class="token punctuation">(</span> task <span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-        setTimeout ( () =&gt; {
-            this.next ();
-        }, 0 );
-
-    }
-    //尾调用函数，一个任务执行完然后再调用下一个任务
-    next () {
-        let task = this.tasks.shift ();
-        task &amp;&amp; task ();
-    }
-
-    eat ( food ) {
-        let task = (food =&gt; () =&gt; {
-            console.log ( `Eat ${food}` );
-            this.next ();
-        }) ( food );
-        this.tasks.push ( task );
-        return this;
-    }
-
-    sleep ( time ) {
-        let task = (time =&gt; () =&gt; {
-            setTimeout ( () =&gt; {
-                console.log ( `Wake up after ${time} s!` );
-                this.next ();
-            }, time * 1000 )
-        }) ( time );
-        this.tasks.push ( task );
-        return this;
-    }
-
-    sleepFirst ( time ) {
-        let task = (time =&gt; () =&gt; {
-            setTimeout ( () =&gt; {
-                console.log ( `Wake up after ${time} s!` );
-                this.next ();
-            }, time * 1000 )
-        }) ( time );
-        this.tasks.unshift ( task );//sleepFirst函数需要最先执行，所以我们需要在任务队列前面放入，然后再执行后面的任务
-        return this;
-    }
-
-}
-```
-</code></pre><p>通过上面的步骤，我们就实现了一个简单的Lazyman了</p>
+sleep <span class="token punctuation">(</span> time <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">let</span> task <span class="token operator">=</span> <span class="token punctuation">(</span>time <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
+        setTimeout <span class="token punctuation">(</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
+            console<span class="token punctuation">.</span>log <span class="token punctuation">(</span> <span class="token template-string"><span class="token string">`Wake up after </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>time<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string"> s!`</span></span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>next <span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span> time <span class="token operator">*</span> <span class="token number">1000</span> <span class="token punctuation">)</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span> <span class="token punctuation">(</span> time <span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>tasks<span class="token punctuation">.</span>push <span class="token punctuation">(</span> task <span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+sleepFirst <span class="token punctuation">(</span> time <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">let</span> task <span class="token operator">=</span> <span class="token punctuation">(</span>time <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
+        setTimeout <span class="token punctuation">(</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
+            console<span class="token punctuation">.</span>log <span class="token punctuation">(</span> <span class="token template-string"><span class="token string">`Wake up after </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>time<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string"> s!`</span></span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>next <span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span> time <span class="token operator">*</span> <span class="token number">1000</span> <span class="token punctuation">)</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span> <span class="token punctuation">(</span> time <span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>tasks<span class="token punctuation">.</span>unshift <span class="token punctuation">(</span> task <span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//sleepFirst函数需要最先执行，所以我们需要在任务队列前面放入，然后再执行后面的任务</span>
+    <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>通过上面的步骤，我们就实现了一个简单的Lazyman了</p>
 <h1 id="改进"><a href="#改进" class="headerlink" title="改进"></a>改进</h1><p>上面明明实现了一个Lazyman了呀，还有什么可以改进的？当然有，如果我们调用<code>eat</code>的时候，想输出的是<code>Eaaaaaaaaaat ${food}!!!!</code>，然后输出<code>好饱啊好饱啊</code><br>这意味着每次改变，我们都要去修改<code>eat</code>这个函数，这就耦合度太高了，这时候，我们可以采用发布订阅的方式，在调用<code>eat</code>的时候，我们注册一个监听函数，然后当任务<br>执行的时候再发布这个事件，让对应的监听函数执行，这样就实现了解耦了</p>
 <h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>一个小小的Lazyman，竟然有如此多的考点，是在让人受益匪浅，当然，Lazyman还可以使用promise的方式实现，当然实现一个手写的Promise实在有点难（逃）,有机会再用promise<br>实现一次哈</p>
 

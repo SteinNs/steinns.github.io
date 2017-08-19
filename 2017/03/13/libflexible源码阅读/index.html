@@ -72,7 +72,7 @@
 
     
         <meta property="article:published_time" content="3月 13, 2017" />
-        <meta property="article:modified_time" content="3月 20, 2017" />
+        <meta property="article:modified_time" content="8月 19, 2017" />
     
 
     <!-- The Twitter Card protocol -->
@@ -113,7 +113,7 @@
     "headline": "libflexible源码阅读",
     "url": "http://yoursite.com/2017/03/13/libflexible源码阅读/index.html",
     "datePublished": "3月 13, 2017",
-    "dateModified": "3月 20, 2017",
+    "dateModified": "8月 19, 2017",
     "description": "",
     "mainEntityOfPage": {
         "@type": "WebPage",
@@ -489,162 +489,151 @@
     
         <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>最近需要一款移动端的产品，当时需要赶工期，在参考了天猫的flexbox布局和手淘的<br>rem布局方案后，决定选用libflexible。做完项目之后，稍有空闲时间，决定看看libflexible<br>如何实现动态设置根元素的字体，从而通过rem的方式改变其他元素大小</p>
 <h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><p>首先我们看一下flexible需要哪些属性</p>
-<pre><code>```javascript
-;(function(win, lib) {
-    var doc = win.document;
-    var docEl = doc.documentElement;
-    var metaEl = doc.querySelector(&#39;meta[name=&quot;viewport&quot;]&#39;);
-    var flexibleEl = doc.querySelector(&#39;meta[name=&quot;flexible&quot;]&#39;);
-    var dpr = 0;
-    var scale = 0;
-    var tid;
-    var flexible = lib.flexible || (lib.flexible = {});
-```
-</code></pre><p>在函数运行时，我们需要将windows对象注入，然后在看看windows下是否已经存在lib（即是否已经有<br>使用过flexible）了，注入完之后，我们依次获得doc，docEl，metaEl，flexibleEl，其中metaEl<br>是为了判断我们是否已经有预设好的viewport，flexibleEl则是判断我们已经手动设置好dpr来避免<br>flexible库动态设置dpr</p>
-<pre><code>   ```javascript
-   if (metaEl) {
-        console.warn(&#39;将根据已有的meta标签来设置缩放比例&#39;);
-        var match = metaEl.getAttribute(&#39;content&#39;).match(/initial\-scale=([\d\.]+)/);
-        if (match) {
-            scale = parseFloat(match[1]);
-            dpr = parseInt(1 / scale);
-        }
-    }
-    ```
-</code></pre><p>如果metaEl存在的话，意味着页面上存在形如<code>&lt;meta name=&quot;viewport&quot; content=&quot;initial-scale=1&quot;&gt;</code>的标签，此时我们已经明确了我们需要的缩放，不再需要flexible的介入，缩放值scale直接<br>使用预设的initial-scale，通过我们预设的的缩放，我们的layout viewport将会是 ideal viewport/scale，如果我们的initual-scale为1的话<br>且ideal为414px的话，我们的layout viewport将会是414px</p>
-<pre><code> ```javascript
- else if (flexibleEl) {
-        var content = flexibleEl.getAttribute(&#39;content&#39;);
-        if (content) {
-            var initialDpr = content.match(/initial\-dpr=([\d\.]+)/);
-            var maximumDpr = content.match(/maximum\-dpr=([\d\.]+)/);
-            if (initialDpr) {
-                dpr = parseFloat(initialDpr[1]);
-                scale = parseFloat((1 / dpr).toFixed(2));
-            }
-            if (maximumDpr) {
-                dpr = parseFloat(maximumDpr[1]);
-                scale = parseFloat((1 / dpr).toFixed(2));
-            }
-        }
-    }
- ```
-</code></pre><p>如果我们没有设置初始的viewport但是有<code>&lt;meta name=&quot;flexible&quot; content=&quot;initial-dpr=2&quot; /&gt;</code>这样的flexible自身的预设<br>那么我们将会有预设的dpr，此时flexible将根据我们预设的dpr通过<code>scale=1/dpr</code>的方式来计算出我们的缩放，进而影响layout viewport<br>的大小</p>
-<pre><code> ```javascript
- if (!dpr &amp;&amp; !scale) {
-        var isAndroid = win.navigator.appVersion.match(/android/gi);
-        var isIPhone = win.navigator.appVersion.match(/iphone/gi);
-        var devicePixelRatio = win.devicePixelRatio;
-        if (isIPhone) {
-            // iOS下，对于2和3的屏，用2倍的方案，其余的用1倍方案
-            if (devicePixelRatio &gt;= 3 &amp;&amp; (!dpr || dpr &gt;= 3)) {
-                dpr = 3;
-            } else if (devicePixelRatio &gt;= 2 &amp;&amp; (!dpr || dpr &gt;= 2)){
-                dpr = 2;
-            } else {
-                dpr = 1;
-            }
-        } else {
-            // 其他设备下，仍旧使用1倍的方案
-            dpr = 1;
-        }
-        scale = 1 / dpr;
-    }
-    ```
-</code></pre><p>接下来，如果我们既没有通过<code>&lt;meta name=&quot;flexible&quot; content=&quot;initial-dpr=2&quot; /&gt;</code>这种方式预设dpr，<br>也没有通过<code>&lt;meta name=&quot;viewport&quot; content=&quot;initial-scale=1&quot;&gt;</code>的方式预设缩放，此时flexible开始根据<br>设备的dpr来动态计算缩放。对于非苹果设备，flexible设置dpr为1，对于苹果设备，iPhone3以下非retina屏，dpr为1<br>iPhone4-iPhone6为retina屏，dpr为2，iPhone6Plus为retina HD屏，dpr为3，由于flexible是一个专注于移动端<br>的解决方案，所以平板（包括iPad）或者桌面端的dpr都为1</p>
-<pre><code>   ```javascript
-   docEl.setAttribute(&#39;data-dpr&#39;, dpr);
-    if (!metaEl) {
-        metaEl = doc.createElement(&#39;meta&#39;);
-        metaEl.setAttribute(&#39;name&#39;, &#39;viewport&#39;);
-        metaEl.setAttribute(&#39;content&#39;, &#39;initial-scale=&#39; + scale + &#39;, maximum-scale=&#39; + scale + &#39;, minimum-scale=&#39; + scale + &#39;, user-scalable=no&#39;);
-        if (docEl.firstElementChild) {
-            docEl.firstElementChild.appendChild(metaEl);
-        } else {
-            var wrap = doc.createElement(&#39;div&#39;);
-            wrap.appendChild(metaEl);
-            doc.write(wrap.innerHTML);
-        }
-    }
-    ```
-</code></pre><p>计算完缩放后，将获取的dpr值设置到根元素上，这样我们就可以通过以下方式：</p>
-<pre><code>```css
-.selector {
-    width: 2rem;
-    border: 1px solid #ddd;
-}
-[data-dpr=&quot;1&quot;] .selector {
-    height: 32px;
-    font-size: 14px;
-}
-[data-dpr=&quot;2&quot;] .selector {
-    height: 64px;
-    font-size: 28px;
-}
-[data-dpr=&quot;3&quot;] .selector {
-    height: 96px;
-    font-size: 42px;
-}
-```
-</code></pre><p>为不同dpr的屏幕设置不同的字体大小，字体之所以不用rem布局，是因为</p>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token punctuation">;</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span>win<span class="token punctuation">,</span> lib<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">var</span> doc <span class="token operator">=</span> win<span class="token punctuation">.</span>document<span class="token punctuation">;</span>
+    <span class="token keyword">var</span> docEl <span class="token operator">=</span> doc<span class="token punctuation">.</span>documentElement<span class="token punctuation">;</span>
+    <span class="token keyword">var</span> metaEl <span class="token operator">=</span> doc<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'meta[name="viewport"]'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">var</span> flexibleEl <span class="token operator">=</span> doc<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'meta[name="flexible"]'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">var</span> dpr <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">var</span> scale <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">var</span> tid<span class="token punctuation">;</span>
+    <span class="token keyword">var</span> flexible <span class="token operator">=</span> lib<span class="token punctuation">.</span>flexible <span class="token operator">||</span> <span class="token punctuation">(</span>lib<span class="token punctuation">.</span>flexible <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>在函数运行时，我们需要将windows对象注入，然后在看看windows下是否已经存在lib（即是否已经有<br>使用过flexible）了，注入完之后，我们依次获得doc，docEl，metaEl，flexibleEl，其中metaEl<br>是为了判断我们是否已经有预设好的viewport，flexibleEl则是判断我们已经手动设置好dpr来避免<br>flexible库动态设置dpr</p>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token keyword">if</span> <span class="token punctuation">(</span>metaEl<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    console<span class="token punctuation">.</span><span class="token function">warn</span><span class="token punctuation">(</span><span class="token string">'将根据已有的meta标签来设置缩放比例'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">var</span> match <span class="token operator">=</span> metaEl<span class="token punctuation">.</span><span class="token function">getAttribute</span><span class="token punctuation">(</span><span class="token string">'content'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">match</span><span class="token punctuation">(</span><span class="token regex">/initial\-scale=([\d\.]+)/</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>match<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        scale <span class="token operator">=</span> <span class="token function">parseFloat</span><span class="token punctuation">(</span>match<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        dpr <span class="token operator">=</span> <span class="token function">parseInt</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">/</span> scale<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>如果metaEl存在的话，意味着页面上存在形如<code>&lt;meta name=&quot;viewport&quot; content=&quot;initial-scale=1&quot;&gt;</code>的标签，此时我们已经明确了我们需要的缩放，不再需要flexible的介入，缩放值scale直接<br>使用预设的initial-scale，通过我们预设的的缩放，我们的layout viewport将会是 ideal viewport/scale，如果我们的initual-scale为1的话<br>且ideal为414px的话，我们的layout viewport将会是414px</p>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>flexibleEl<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">var</span> content <span class="token operator">=</span> flexibleEl<span class="token punctuation">.</span><span class="token function">getAttribute</span><span class="token punctuation">(</span><span class="token string">'content'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>content<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">var</span> initialDpr <span class="token operator">=</span> content<span class="token punctuation">.</span><span class="token function">match</span><span class="token punctuation">(</span><span class="token regex">/initial\-dpr=([\d\.]+)/</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">var</span> maximumDpr <span class="token operator">=</span> content<span class="token punctuation">.</span><span class="token function">match</span><span class="token punctuation">(</span><span class="token regex">/maximum\-dpr=([\d\.]+)/</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>initialDpr<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            dpr <span class="token operator">=</span> <span class="token function">parseFloat</span><span class="token punctuation">(</span>initialDpr<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            scale <span class="token operator">=</span> <span class="token function">parseFloat</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">/</span> dpr<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toFixed</span><span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>maximumDpr<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            dpr <span class="token operator">=</span> <span class="token function">parseFloat</span><span class="token punctuation">(</span>maximumDpr<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            scale <span class="token operator">=</span> <span class="token function">parseFloat</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">/</span> dpr<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toFixed</span><span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>如果我们没有设置初始的viewport但是有<code>&lt;meta name=&quot;flexible&quot; content=&quot;initial-dpr=2&quot; /&gt;</code>这样的flexible自身的预设<br>那么我们将会有预设的dpr，此时flexible将根据我们预设的dpr通过<code>scale=1/dpr</code>的方式来计算出我们的缩放，进而影响layout viewport<br>的大小</p>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>dpr <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>scale<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">var</span> isAndroid <span class="token operator">=</span> win<span class="token punctuation">.</span>navigator<span class="token punctuation">.</span>appVersion<span class="token punctuation">.</span><span class="token function">match</span><span class="token punctuation">(</span><span class="token regex">/android/gi</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">var</span> isIPhone <span class="token operator">=</span> win<span class="token punctuation">.</span>navigator<span class="token punctuation">.</span>appVersion<span class="token punctuation">.</span><span class="token function">match</span><span class="token punctuation">(</span><span class="token regex">/iphone/gi</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">var</span> devicePixelRatio <span class="token operator">=</span> win<span class="token punctuation">.</span>devicePixelRatio<span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>isIPhone<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+         <span class="token comment" spellcheck="true">// iOS下，对于2和3的屏，用2倍的方案，其余的用1倍方案</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>devicePixelRatio <span class="token operator">>=</span> <span class="token number">3</span> <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span><span class="token operator">!</span>dpr <span class="token operator">||</span> dpr <span class="token operator">>=</span> <span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            dpr <span class="token operator">=</span> <span class="token number">3</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>devicePixelRatio <span class="token operator">>=</span> <span class="token number">2</span> <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span><span class="token operator">!</span>dpr <span class="token operator">||</span> dpr <span class="token operator">>=</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+            dpr <span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            dpr <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 其他设备下，仍旧使用1倍的方案</span>
+        dpr <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    scale <span class="token operator">=</span> <span class="token number">1</span> <span class="token operator">/</span> dpr<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>接下来，如果我们既没有通过<code>&lt;meta name=&quot;flexible&quot; content=&quot;initial-dpr=2&quot; /&gt;</code>这种方式预设dpr，<br>也没有通过<code>&lt;meta name=&quot;viewport&quot; content=&quot;initial-scale=1&quot;&gt;</code>的方式预设缩放，此时flexible开始根据<br>设备的dpr来动态计算缩放。对于非苹果设备，flexible设置dpr为1，对于苹果设备，iPhone3以下非retina屏，dpr为1<br>iPhone4-iPhone6为retina屏，dpr为2，iPhone6Plus为retina HD屏，dpr为3，由于flexible是一个专注于移动端<br>的解决方案，所以平板（包括iPad）或者桌面端的dpr都为1</p>
+<pre class=" language-javascript"><code class="language-javascript">docEl<span class="token punctuation">.</span><span class="token function">setAttribute</span><span class="token punctuation">(</span><span class="token string">'data-dpr'</span><span class="token punctuation">,</span> dpr<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>metaEl<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    metaEl <span class="token operator">=</span> doc<span class="token punctuation">.</span><span class="token function">createElement</span><span class="token punctuation">(</span><span class="token string">'meta'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    metaEl<span class="token punctuation">.</span><span class="token function">setAttribute</span><span class="token punctuation">(</span><span class="token string">'name'</span><span class="token punctuation">,</span> <span class="token string">'viewport'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    metaEl<span class="token punctuation">.</span><span class="token function">setAttribute</span><span class="token punctuation">(</span><span class="token string">'content'</span><span class="token punctuation">,</span> <span class="token string">'initial-scale='</span> <span class="token operator">+</span> scale <span class="token operator">+</span> <span class="token string">', maximum-scale='</span> <span class="token operator">+</span> scale <span class="token operator">+</span> <span class="token string">', minimum-scale='</span> <span class="token operator">+</span> scale <span class="token operator">+</span> <span class="token string">', user-scalable=no'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>docEl<span class="token punctuation">.</span>firstElementChild<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        docEl<span class="token punctuation">.</span>firstElementChild<span class="token punctuation">.</span><span class="token function">appendChild</span><span class="token punctuation">(</span>metaEl<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        <span class="token keyword">var</span> wrap <span class="token operator">=</span> doc<span class="token punctuation">.</span><span class="token function">createElement</span><span class="token punctuation">(</span><span class="token string">'div'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        wrap<span class="token punctuation">.</span><span class="token function">appendChild</span><span class="token punctuation">(</span>metaEl<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        doc<span class="token punctuation">.</span><span class="token function">write</span><span class="token punctuation">(</span>wrap<span class="token punctuation">.</span>innerHTML<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>计算完缩放后，将获取的dpr值设置到根元素上，这样我们就可以通过以下方式：</p>
+<pre class=" language-css"><code class="language-css"><span class="token selector"><span class="token class">.selector</span> </span><span class="token punctuation">{</span>
+    <span class="token property">width</span><span class="token punctuation">:</span> <span class="token number">2</span>rem<span class="token punctuation">;</span>
+    <span class="token property">border</span><span class="token punctuation">:</span> <span class="token number">1</span>px solid <span class="token hexcode">#ddd</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token selector"><span class="token attribute">[data-dpr="1"]</span> <span class="token class">.selector</span> </span><span class="token punctuation">{</span>
+    <span class="token property">height</span><span class="token punctuation">:</span> <span class="token number">32</span>px<span class="token punctuation">;</span>
+    <span class="token property">font-size</span><span class="token punctuation">:</span> <span class="token number">14</span>px<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token selector"><span class="token attribute">[data-dpr="2"]</span> <span class="token class">.selector</span> </span><span class="token punctuation">{</span>
+    <span class="token property">height</span><span class="token punctuation">:</span> <span class="token number">64</span>px<span class="token punctuation">;</span>
+    <span class="token property">font-size</span><span class="token punctuation">:</span> <span class="token number">28</span>px<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token selector"><span class="token attribute">[data-dpr="3"]</span> <span class="token class">.selector</span> </span><span class="token punctuation">{</span>
+    <span class="token property">height</span><span class="token punctuation">:</span> <span class="token number">96</span>px<span class="token punctuation">;</span>
+    <span class="token property">font-size</span><span class="token punctuation">:</span> <span class="token number">42</span>px<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>为不同dpr的屏幕设置不同的字体大小，字体之所以不用rem布局，是因为</p>
 <blockquote>
 <p>  我们不希望文本在Retina屏幕下变小，另外，我们希望在大屏手机上看到更多文本，以及，现在绝大多数的字体文件都自带一些点阵尺寸，通常是16px和24px，所以我们不希望出现13px和15px这样的奇葩尺寸。</p>
 </blockquote>
 <p>同时当不存在metaEl时，flexible动态生成一条<code>&lt;meta name=&quot;viewport&quot; content=&quot;initial-scale=${scale},maximum-scale=${scale},minimum-scale=${scale},user-scalable=no&quot;&gt;</code><br>的标签，如果<code>&lt;html&gt;</code>下存在元素（如<code>&lt;head&gt;</code>等元素）那么，将meta标签插入，如果没有，就将meta标签用一个div包装，然后<br>通过document.write写入到文档中</p>
-<pre><code> ```javascript
- function refreshRem(){
-        var width = docEl.getBoundingClientRect().width;
-        if (width / dpr &gt; 540) {
-            width = 540 * dpr;
-        }
-        var rem = width / 10;
-        docEl.style.fontSize = rem + &#39;px&#39;;
-        flexible.rem = win.rem = rem;
-    }
-   ```
-</code></pre><p>好了，缩放和dpr都设置好了，下一步我们要设置根元素的font-size了，这样我们可以通过rem的方式<br>适配不同屏幕。首先我们需要通过<code>docEl.getBoundingClientRect().width</code>获得layout viewport的宽度，<br>然后将layout viewport宽度分为10份，1份为1rem。至于设置540px，是为了让在ipad横屏这种情况下浏览页面，不至于因为拉伸适配后体验太差。当然这还是有一点点问题的<br>因为这样10rem将不会是ipad的满屏了。当然这是移动端解决方案，并没有考虑平板和桌面端</p>
-<pre><code>  ```javascript
-  win.addEventListener(&#39;resize&#39;, function() {
-        clearTimeout(tid);
-        tid = setTimeout(refreshRem, 300);
-    }, false);
-    win.addEventListener(&#39;pageshow&#39;, function(e) {
-        if (e.persisted) {
-            clearTimeout(tid);
-            tid = setTimeout(refreshRem, 300);
-        }
-    }, false);
-   ```
-</code></pre><p>接着当窗口发生变化或者页面重新从缓存中载入时，我们都要重新设置尺寸</p>
-<pre><code> ```javascript
- if (doc.readyState === &#39;complete&#39;) {
-        doc.body.style.fontSize = 12 * dpr + &#39;px&#39;;
-    } else {
-        doc.addEventListener(&#39;DOMContentLoaded&#39;, function(e) {
-            doc.body.style.fontSize = 12 * dpr + &#39;px&#39;;
-        }, false);
-    }
- ```
-</code></pre><p>body上设置12 * dpr的font-size值，为了重置页面中的字体默认值，不然没有设置font-size的元素会继承html上的font-size，变得很大。</p>
-<pre><code>    ```javascript
-    flexible.dpr = win.dpr = dpr;
-            flexible.refreshRem = refreshRem;
-            flexible.rem2px = function ( d ) {
-                var val = parseFloat ( d ) * this.rem;
-                if ( typeof d === &#39;string&#39; &amp;&amp; d.match ( /rem$/ ) ) {
-                    val += &#39;px&#39;;
-                }
-                return val;
-            }
-            flexible.px2rem = function ( d ) {
-                var val = parseFloat ( d ) / this.rem;
-                if ( typeof d === &#39;string&#39; &amp;&amp; d.match ( /px$/ ) ) {
-                    val += &#39;rem&#39;;
-                }
-                return val;
-            }
-    ```
-</code></pre><p>最后，flexible提供了两个工具函数px2rem和rem2px，这里就不在阐述了</p>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">refreshRem</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">var</span> width <span class="token operator">=</span> docEl<span class="token punctuation">.</span><span class="token function">getBoundingClientRect</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>width<span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>width <span class="token operator">/</span> dpr <span class="token operator">></span> <span class="token number">540</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        width <span class="token operator">=</span> <span class="token number">540</span> <span class="token operator">*</span> dpr<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">var</span> rem <span class="token operator">=</span> width <span class="token operator">/</span> <span class="token number">10</span><span class="token punctuation">;</span>
+    docEl<span class="token punctuation">.</span>style<span class="token punctuation">.</span>fontSize <span class="token operator">=</span> rem <span class="token operator">+</span> <span class="token string">'px'</span><span class="token punctuation">;</span>
+    flexible<span class="token punctuation">.</span>rem <span class="token operator">=</span> win<span class="token punctuation">.</span>rem <span class="token operator">=</span> rem<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>好了，缩放和dpr都设置好了，下一步我们要设置根元素的font-size了，这样我们可以通过rem的方式<br>适配不同屏幕。首先我们需要通过<code>docEl.getBoundingClientRect().width</code>获得layout viewport的宽度，<br>然后将layout viewport宽度分为10份，1份为1rem。至于设置540px，是为了让在ipad横屏这种情况下浏览页面，不至于因为拉伸适配后体验太差。当然这还是有一点点问题的<br>因为这样10rem将不会是ipad的满屏了。当然这是移动端解决方案，并没有考虑平板和桌面端</p>
+<pre class=" language-javascript"><code class="language-javascript">win<span class="token punctuation">.</span><span class="token function">addEventListener</span><span class="token punctuation">(</span><span class="token string">'resize'</span><span class="token punctuation">,</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">clearTimeout</span><span class="token punctuation">(</span>tid<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    tid <span class="token operator">=</span> <span class="token function">setTimeout</span><span class="token punctuation">(</span>refreshRem<span class="token punctuation">,</span> <span class="token number">300</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+win<span class="token punctuation">.</span><span class="token function">addEventListener</span><span class="token punctuation">(</span><span class="token string">'pageshow'</span><span class="token punctuation">,</span> <span class="token keyword">function</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>e<span class="token punctuation">.</span>persisted<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">clearTimeout</span><span class="token punctuation">(</span>tid<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        tid <span class="token operator">=</span> <span class="token function">setTimeout</span><span class="token punctuation">(</span>refreshRem<span class="token punctuation">,</span> <span class="token number">300</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>接着当窗口发生变化或者页面重新从缓存中载入时，我们都要重新设置尺寸</p>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token keyword">if</span> <span class="token punctuation">(</span>doc<span class="token punctuation">.</span>readyState <span class="token operator">===</span> <span class="token string">'complete'</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    doc<span class="token punctuation">.</span>body<span class="token punctuation">.</span>style<span class="token punctuation">.</span>fontSize <span class="token operator">=</span> <span class="token number">12</span> <span class="token operator">*</span> dpr <span class="token operator">+</span> <span class="token string">'px'</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    doc<span class="token punctuation">.</span><span class="token function">addEventListener</span><span class="token punctuation">(</span><span class="token string">'DOMContentLoaded'</span><span class="token punctuation">,</span> <span class="token keyword">function</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        doc<span class="token punctuation">.</span>body<span class="token punctuation">.</span>style<span class="token punctuation">.</span>fontSize <span class="token operator">=</span> <span class="token number">12</span> <span class="token operator">*</span> dpr <span class="token operator">+</span> <span class="token string">'px'</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>body上设置12 * dpr的font-size值，为了重置页面中的字体默认值，不然没有设置font-size的元素会继承html上的font-size，变得很大。</p>
+<pre class=" language-javascript"><code class="language-javascript">flexible<span class="token punctuation">.</span>dpr <span class="token operator">=</span> win<span class="token punctuation">.</span>dpr <span class="token operator">=</span> dpr<span class="token punctuation">;</span>
+flexible<span class="token punctuation">.</span>refreshRem <span class="token operator">=</span> refreshRem<span class="token punctuation">;</span>
+flexible<span class="token punctuation">.</span>rem2px <span class="token operator">=</span> <span class="token keyword">function</span> <span class="token punctuation">(</span> d <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+<span class="token keyword">var</span> val <span class="token operator">=</span> parseFloat <span class="token punctuation">(</span> d <span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token keyword">this</span><span class="token punctuation">.</span>rem<span class="token punctuation">;</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span> <span class="token keyword">typeof</span> d <span class="token operator">===</span> <span class="token string">'string'</span> <span class="token operator">&amp;&amp;</span> d<span class="token punctuation">.</span>match <span class="token punctuation">(</span> <span class="token regex">/rem$/</span> <span class="token punctuation">)</span> <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    val <span class="token operator">+</span><span class="token operator">=</span> <span class="token string">'px'</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">return</span> val<span class="token punctuation">;</span>             <span class="token punctuation">}</span>
+flexible<span class="token punctuation">.</span>px2rem <span class="token operator">=</span> <span class="token keyword">function</span> <span class="token punctuation">(</span> d <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">var</span> val <span class="token operator">=</span> parseFloat <span class="token punctuation">(</span> d <span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token keyword">this</span><span class="token punctuation">.</span>rem<span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span> <span class="token keyword">typeof</span> d <span class="token operator">===</span> <span class="token string">'string'</span> <span class="token operator">&amp;&amp;</span> d<span class="token punctuation">.</span>match <span class="token punctuation">(</span> <span class="token regex">/px$/</span> <span class="token punctuation">)</span> <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    val <span class="token operator">+</span><span class="token operator">=</span> <span class="token string">'rem'</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+    <span class="token keyword">return</span> val<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>最后，flexible提供了两个工具函数px2rem和rem2px，这里就不在阐述了</p>
 <h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>看完flexible，实实在在的感受到rem布局的妙处，通过动态设置缩放系数的方式，<br>让layout viewport与设计图对应，极大地方便了重构，同时也避免了1px的问题，<br>然而略有遗憾的就是在安卓和ipad上的表现不佳了。</p>
 
     
